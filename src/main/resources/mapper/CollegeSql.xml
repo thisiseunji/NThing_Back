@@ -1,7 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="data.mapper.CollegeMapper">
-    <select id="selectCollegeList" resultType="CollegeDto">
-        select * from college
+    <select id="selectCollegeById" resultType="CollegeDto" parameterType="Integer">
+        SELECT * FROM college WHERE id = #{id}
     </select>
+
+    <select id="selectCollegeList" resultType="CollegeDto" parameterType="String">
+        select * from college
+        <if test="search_keyword != null and !search_keyword.equals('')">
+            where name like CONCAT('%', ${search_keyword}, '%')
+        </if>
+    </select>
+
+    <insert id="insertCollege">
+        insert into college (id, name, address, latitude, longitude )
+        values (null, #{name}, #{address}, #{latitude}, #{longitude})
+    </insert>
 </mapper>
