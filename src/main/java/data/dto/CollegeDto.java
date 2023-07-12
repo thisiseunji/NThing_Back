@@ -9,6 +9,6 @@ public class CollegeDto {
     private int id;
     private String name;
     private String address;
-    private Float latitude;
-    private Float longitude;
+    private String latitude;
+    private String longitude;
 }
