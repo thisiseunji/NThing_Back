@@ -8,6 +8,7 @@ import org.apache.ibatis.type.Alias;
 public class CollegeDto {
     private int id;
     private String name;
-    private Float latitude;
-    private Float longitude;
+    private String address;
+    private String latitude;
+    private String longitude;
 }
