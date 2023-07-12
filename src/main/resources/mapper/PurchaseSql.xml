@@ -113,9 +113,11 @@
             ,date = #{date}
             ,denominator = #{denominator}
             ,numerator = #{numerator}
+            ,status = #{status}
             ,price = #{price}
             ,place = #{place}
             ,image = #{image}
+            ,updated_at = now()
             ,category_id = #{category_id}
         where
             id = #{id}

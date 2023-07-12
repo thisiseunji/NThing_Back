@@ -47,9 +47,12 @@ public class PurchaseDto {
         private Timestamp date;
         private int denominator;
         private int numerator;
+        private boolean status;
         private int price;
         private String place;
         private String image;
+        @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
+        private Timestamp updatedAt;
         private int manager_id;
         private int category_id;
 
