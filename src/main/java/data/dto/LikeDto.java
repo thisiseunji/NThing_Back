@@ -6,9 +6,9 @@ import lombok.Data;
 import org.apache.ibatis.type.Alias;
 
 @Data
-@Alias("PurchaseUserDto")
+@Alias("LikeDto")
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-public class PurchaseUserDto {
+public class LikeDto {
     private int id;
     private int userId;
     private int purchaseId;

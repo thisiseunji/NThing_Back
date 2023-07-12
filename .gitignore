@@ -37,4 +37,8 @@ out/
 .vscode/
 
 application.yml
+
 application-API-KEY.properties
+
+# 파일 업로드 저장 경로
+src/main/resources/static/uploads/*
