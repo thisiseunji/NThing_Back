@@ -53,13 +53,9 @@ public class PurchaseDto {
         private int manager_id;
         private int category_id;
 
-        public void setImage(MultipartFile imageFile) {
+        public void setImage(MultipartFile imageFile) throws IOException {
             if(!imageFile.isEmpty()) {
-                try {
-                    this.image = FileUploadUtil.uploadFile(imageFile);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
+                this.image = FileUploadUtil.uploadFile(imageFile);
             }
         }
     }

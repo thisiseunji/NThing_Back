@@ -1,10 +1,8 @@
 package data.controller;
 
-import data.Service.PurchaseService;
+import data.service.PurchaseService;
 import data.dto.PurchaseDto;
-import data.util.FileUploadUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -46,13 +44,7 @@ public class PurchaseController {
     public void updatePurchase(
             @RequestParam(value = "image", required = false) MultipartFile imageFile,
             @ModelAttribute PurchaseDto.Request purchaseRequest
-    ){
-        PurchaseDto.Detail purchase = purchaseService.findPurchaseById(purchaseRequest.getId());
-
-        if(StringUtils.hasText(purchase.getImage())) {
-            FileUploadUtil.deleteFile(purchase.getImage());
-        }
-
+    ) {
         purchaseService.updatePurchase(purchaseRequest);
     }
 
