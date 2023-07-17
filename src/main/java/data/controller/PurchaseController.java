@@ -4,7 +4,6 @@ import data.service.PurchaseService;
 import data.dto.PurchaseDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashMap;
 import java.util.List;
@@ -20,10 +19,7 @@ public class PurchaseController {
     }
 
     @PostMapping("/purchase")
-    public void createPurchase(
-            @RequestParam(value = "image", required = false) MultipartFile imageFile,
-            @ModelAttribute PurchaseDto.Request purchaseRequest
-    ) {
+    public void createPurchase(PurchaseDto.Request purchaseRequest) {
         purchaseService.createPurchase(purchaseRequest);
     }
 
@@ -41,10 +37,7 @@ public class PurchaseController {
     }
 
     @PatchMapping("/purchase")
-    public void updatePurchase(
-            @RequestParam(value = "image", required = false) MultipartFile imageFile,
-            @ModelAttribute PurchaseDto.Request purchaseRequest
-    ) {
+    public void updatePurchase(PurchaseDto.Request purchaseRequest) {
         purchaseService.updatePurchase(purchaseRequest);
     }
 
