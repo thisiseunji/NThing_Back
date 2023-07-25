@@ -3,32 +3,33 @@ package data.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import data.util.FileUploadUtil;
 import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PurchaseDto {
 
     @Getter
     @Builder
     @AllArgsConstructor
-    public static class Info {
+    public static class Purchase {
         private int id;
         private String title;
         private String description;
-        private Float latitude;
-        private Float longitude;
+        private Double latitude;
+        private Double longitude;
         private Timestamp date;
         private int denominator;
         private int numerator;
         private boolean status;
         private int price;
         private String place;
-        private String image;
         private Timestamp updatedAt;
+        private boolean deleteYn;
+        private Timestamp deletedAt;
         private int managerId;
         private int categoryId;
     }
@@ -41,8 +42,8 @@ public class PurchaseDto {
         private int id;
         private String title;
         private String description;
-        private Float latitude;
-        private Float longitude;
+        private Double latitude;
+        private Double longitude;
         @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
         private Timestamp date;
         private int denominator;
@@ -50,17 +51,14 @@ public class PurchaseDto {
         private boolean status;
         private int price;
         private String place;
-        private String image;
+        private List<MultipartFile> files = new ArrayList<>();
         @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
         private Timestamp updatedAt;
         private int manager_id;
         private int category_id;
 
-        public void setImage(MultipartFile imageFile) throws IOException {
-            if(!imageFile.isEmpty()) {
-                this.image = FileUploadUtil.uploadFile(imageFile);
-            }
-        }
+        // 삭제할 첨부파일 id List
+        private List<Integer> removeFileIds = new ArrayList<>();
     }
 
     @Getter
@@ -70,8 +68,8 @@ public class PurchaseDto {
     public static class Summary {
         private int id;
         private String title;
-        private Float latitude;
-        private Float longitude;
+        private Double latitude;
+        private Double longitude;
         @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
         private Timestamp date;
         private int denominator;
@@ -79,7 +77,6 @@ public class PurchaseDto {
         private int price;
         private String place;
         private boolean status;
-        private String image;
         private boolean isLiked;
     }
 
@@ -91,8 +88,8 @@ public class PurchaseDto {
         private int id;
         private String title;
         private String description;
-        private Float latitude;
-        private Float longitude;
+        private Double latitude;
+        private Double longitude;
         @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
         private Timestamp date;
         private int denominator;
@@ -100,7 +97,6 @@ public class PurchaseDto {
         private boolean status;
         private int price;
         private String place;
-        private String image;
         @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
         private Timestamp updatedAt;
         private int managerId;

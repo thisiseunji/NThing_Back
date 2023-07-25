@@ -13,7 +13,7 @@ import java.util.UUID;
 
 import static java.util.Objects.requireNonNull;
 
-public class FileUploadUtil {
+public class FileUtil {
 
     private static final String UPLOAD_DIR = "src/main/resources/static/uploads";
 
