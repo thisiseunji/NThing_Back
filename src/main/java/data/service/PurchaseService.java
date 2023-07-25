@@ -1,8 +1,7 @@
-package data.Service;
+package data.service;
 
 import data.dto.PurchaseDto;
 import data.mapper.PurchaseMapper;
-import data.util.FileUploadUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,8 +18,9 @@ public class PurchaseService {
         this.purchaseMapper = purchaseMapper;
     }
 
-    public void createPurchase(PurchaseDto.Request purchase) {
-        purchaseMapper.createPurchase(purchase);
+    public int createPurchase(PurchaseDto.Request purchaseRequest) {
+        purchaseMapper.createPurchase(purchaseRequest);
+        return purchaseRequest.getId();
     }
 
     public List<PurchaseDto.Summary> findAllPurchase(HashMap<String, Object> map) {
@@ -31,12 +31,11 @@ public class PurchaseService {
         return purchaseMapper.findPurchaseById(id);
     }
 
-    public void updatePurchase(PurchaseDto.Request purchase) {
-        purchaseMapper.updatePurchase(purchase);
+    public void updatePurchase(PurchaseDto.Request purchaseRequest) {
+        purchaseMapper.updatePurchase(purchaseRequest);
     }
 
     public void deletePurchase(int id) {
-        FileUploadUtil.deleteFile(findPurchaseById(id).getImage());
         purchaseMapper.deletePurchase(id);
     }
 }
