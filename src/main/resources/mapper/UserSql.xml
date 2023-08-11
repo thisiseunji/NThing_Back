@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="data.mapper.UserMapper">
-    <insert id="join" parameterType="UserDto">
+    <insert id="join" parameterType="UserDto" useGeneratedKeys="true" keyProperty="id">
         insert into user
             (
              id
@@ -33,9 +33,25 @@
         FROM
             user
     </select>
-    <select id="findByEmail" resultType="boolean" parameterType="string">
+    <select id="findById" resultType="userDto" parameterType="int">
         SELECT
-            count(*)
+            *
+        FROM
+            user
+        where
+            id = #{id}
+    </select>
+    <select id="findByEmail" resultType="int" parameterType="string">
+        SELECT
+            id
+        FROM
+            user
+        where
+            email = #{email}
+    </select>
+    <select id="isValidEmail" resultType="boolean" parameterType="string">
+        SELECT
+            count(id)
         FROM
             user
         where

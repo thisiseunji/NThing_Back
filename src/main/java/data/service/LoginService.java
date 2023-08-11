@@ -3,9 +3,11 @@ package data.service;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseToken;
-import data.dto.TokenDto;
+import data.dto.IdToken;
+import data.dto.JwtToken;
 import data.dto.UserDto;
 import data.mapper.UserMapper;
+import data.util.JwtProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,30 +15,47 @@ import org.springframework.stereotype.Service;
 public class LoginService {
 
     private final UserMapper userMapper;
+    private final JwtProvider jwtProvider;
 
     @Autowired
-    public LoginService(UserMapper userMapper) {
+    public LoginService(UserMapper userMapper, JwtProvider jwtProvider) {
         this.userMapper = userMapper;
+        this.jwtProvider = jwtProvider;
     }
 
-    public void login(TokenDto tokenDto) throws FirebaseAuthException {
-        String idToken = tokenDto.getIdToken();
+    public JwtToken login(IdToken token) throws FirebaseAuthException {
+
+        String idToken = token.getIdToken();
         FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(idToken);
 
-        if (userMapper.findByEmail(decodedToken.getEmail())) {
+        if (duplicatedEmail(decodedToken.getEmail())) {
             System.out.println("로그인");
+            int findId = userMapper.findByEmail(decodedToken.getEmail());
+            return JwtToken.builder()
+                    .token(jwtProvider.createToken(findId))
+                    .build();
         } else {
             System.out.println("회원가입");
-            UserDto userDto = UserDto.builder()
-                    .nickname(decodedToken.getName())
-                    .email(decodedToken.getEmail())
-                    .profileImage(decodedToken.getPicture())
-                    .providerId(decodedToken.getUid())
-                    .provider("google")
+            return JwtToken.builder()
+                    .token(signUp(decodedToken))
                     .build();
-
-            userMapper.join(userDto);
         }
+    }
 
+    public String signUp(FirebaseToken decodedToken) {
+
+        UserDto userDto = UserDto.builder()
+                .nickname(decodedToken.getName())
+                .email(decodedToken.getEmail())
+                .profileImage(decodedToken.getPicture())
+                .providerId(decodedToken.getUid())
+                .provider("google")
+                .build();
+
+        return jwtProvider.createToken(userMapper.join(userDto));
+    }
+
+    private boolean duplicatedEmail(String email) {
+        return userMapper.isValidEmail(email);
     }
 }

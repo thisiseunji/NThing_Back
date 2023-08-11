@@ -19,7 +19,6 @@ public class FirebaseConfig {
     @Bean
     public FirebaseApp firebaseApp() throws IOException {
 
-
         FileInputStream serviceAccount = new FileInputStream(keyFile);
 
         FirebaseOptions options = FirebaseOptions.builder()

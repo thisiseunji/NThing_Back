@@ -1,7 +1,8 @@
 package data.controller;
 
 import com.google.firebase.auth.FirebaseAuthException;
-import data.dto.TokenDto;
+import data.dto.IdToken;
+import data.dto.JwtToken;
 import data.service.LoginService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -17,8 +18,7 @@ public class LoginController {
     }
 
     @PostMapping("/login/google")
-    public void googleLogin(@RequestBody TokenDto tokenDto) throws FirebaseAuthException {
-
-        loginService.login(tokenDto);
+    public JwtToken googleLogin(@RequestBody IdToken token) throws FirebaseAuthException {
+        return loginService.login(token);
     }
 }

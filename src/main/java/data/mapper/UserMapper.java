@@ -7,8 +7,10 @@ import java.util.List;
 
 @Mapper
 public interface UserMapper {
-    void join(UserDto userDto);
+    int join(UserDto userDto);
     List<UserDto> findAll();
-    boolean findByEmail(String email);
+    UserDto findById(int id);
+    int findByEmail(String email);
+    boolean isValidEmail(String email);
     void deleteUser(int id);
 }

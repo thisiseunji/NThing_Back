@@ -22,8 +22,13 @@ public class UserController {
         return userService.findAll();
     }
 
-    @DeleteMapping("/user/{id}")
-    public void deleteUser(@PathVariable int id) {
-        userService.deleteUser(id);
+    @GetMapping("/user")
+    public UserDto findById(@RequestHeader("Authorization") String token) {
+        return userService.findById(token);
+    }
+
+    @DeleteMapping("/user")
+    public void deleteUser(@RequestHeader("Authorization") String token) {
+        userService.deleteUser(token);
     }
 }

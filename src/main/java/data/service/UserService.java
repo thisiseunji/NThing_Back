@@ -2,6 +2,7 @@ package data.service;
 
 import data.dto.UserDto;
 import data.mapper.UserMapper;
+import data.util.JwtProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -11,17 +12,25 @@ import java.util.List;
 public class UserService {
 
     private final UserMapper userMapper;
+    private final JwtProvider jwtProvider;
 
     @Autowired
-    public UserService(UserMapper userMapper) {
+    public UserService(UserMapper userMapper, JwtProvider jwtProvider) {
         this.userMapper = userMapper;
+        this.jwtProvider = jwtProvider;
     }
 
     public List<UserDto> findAll() {
         return userMapper.findAll();
     }
 
-    public void deleteUser(int id) {
-        userMapper.deleteUser(id);
+    public UserDto findById(String token) {
+        int loginId = jwtProvider.parseJwt(token);
+        return userMapper.findById(loginId);
+    }
+
+    public void deleteUser(String token) {
+        int loginId = jwtProvider.parseJwt(token);
+        userMapper.deleteUser(loginId);
     }
 }

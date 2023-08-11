@@ -31,7 +31,6 @@ public class FileUtil {
         try (InputStream inputStream = file.getInputStream()) {
             Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
         }
-
         return fileName;
     }
 
@@ -41,7 +40,6 @@ public class FileUtil {
         if(file.exists()) {
             if(file.delete())
                 System.out.println(fileName+" delete");
-
         }
     }
 

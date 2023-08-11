@@ -3,6 +3,6 @@ package data.dto;
 import lombok.Getter;
 
 @Getter
-public class TokenDto {
+public class IdToken {
     private String idToken;
 }
