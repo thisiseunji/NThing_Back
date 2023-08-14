@@ -44,12 +44,17 @@ public class LoginService {
 
     public String signUp(FirebaseToken decodedToken) {
 
+        String identity = decodedToken.getClaims().get("firebase").toString();
+
+        String provider = identity.split("sign_in_provider=")[1].split("\\.")[0];
+        String providerId = identity.split("google.com=\\[")[1].split("]")[0];
+
         UserDto userDto = UserDto.builder()
                 .nickname(decodedToken.getName())
                 .email(decodedToken.getEmail())
                 .profileImage(decodedToken.getPicture())
-                .providerId(decodedToken.getUid())
-                .provider("google")
+                .providerId(providerId)
+                .provider(provider)
                 .build();
 
         return jwtProvider.createToken(userMapper.join(userDto));
