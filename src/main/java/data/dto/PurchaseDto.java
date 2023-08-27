@@ -81,8 +81,10 @@ public class PurchaseDto {
     }
 
     @Getter
+    @Setter
     @Builder
     @AllArgsConstructor
+    @NoArgsConstructor
     @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
     public static class Detail {
         private int id;
@@ -103,5 +105,7 @@ public class PurchaseDto {
         private int categoryId;
         private String categoryName;
         private boolean isLiked;
+
+        private List<String> images;
     }
 }

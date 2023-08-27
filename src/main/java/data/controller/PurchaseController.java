@@ -6,6 +6,8 @@ import data.service.PurchaseService;
 import data.dto.PurchaseDto;
 import data.util.MultiFileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -41,8 +43,13 @@ public class PurchaseController {
     }
 
     @GetMapping("/purchase/{id}")
-    public PurchaseDto.Detail findById(@PathVariable int id) {
-        return purchaseService.findPurchaseById(id);
+    public ResponseEntity<?> findById(@PathVariable int id) {
+        PurchaseDto.Detail detail = purchaseService.findPurchaseById(id);
+
+        if (detail == null)
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Purchase not found");
+
+        return ResponseEntity.ok(detail);
     }
 
     @PatchMapping("/purchase")
