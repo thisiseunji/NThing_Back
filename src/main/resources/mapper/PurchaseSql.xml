@@ -83,7 +83,7 @@
             ,a.price
             ,a.place
             ,a.updated_at
-            ,a.manager_id
+            ,d.nickname as manager
             ,a.category_id
             ,c.name as category_name
             ,(
@@ -98,6 +98,7 @@
         from
             nthing.purchase as a
             left join category c on a.category_id = c.id
+            left join user d on a.manager_id = d.id
         where
             a.id = #{id}
             and a.delete_yn = 0

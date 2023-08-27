@@ -99,7 +99,7 @@ public class PurchaseDto {
         private String place;
         @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
         private Timestamp updatedAt;
-        private int managerId;
+        private String manager;
         private int categoryId;
         private String categoryName;
         private boolean isLiked;
