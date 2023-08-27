@@ -10,6 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -21,6 +22,9 @@ public class MultiFileUtils {
 
     @Value("${upload-path}")
     private String uploadPath;
+
+    @Value("${local-image-path}")
+    private String localImagePath;
 
     /**
      * 다중 파일 업로드
@@ -65,6 +69,23 @@ public class MultiFileUtils {
                 .save_name(saveName)
                 .size((int) multipartFile.getSize())
                 .build();
+    }
+
+    /**
+     * 파일 로컬 경로 변환
+     * @param imageList - image_name list
+     * @return - image_file_path list
+     */
+    public List<String> generateFilePath(List<FileDto.Response> imageList) {
+        List<String> filePathList = new ArrayList<>();
+        SimpleDateFormat format = new SimpleDateFormat("yyMMdd");
+
+        for (FileDto.Response image : imageList) {
+            String filePath = localImagePath + format.format(image.getCreatedDate()) + "/" + image.getSaveName();
+            filePathList.add(filePath);
+        }
+
+        return filePathList;
     }
 
     /**

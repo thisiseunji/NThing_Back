@@ -92,7 +92,7 @@
                 from
                     nthing.like b
                 where true
-                  and b.user_id = 3
+                  and b.user_id = 1
                   and b.purchase_id = a.id
             ) as is_liked
         from
