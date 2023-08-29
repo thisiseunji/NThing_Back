@@ -34,7 +34,6 @@ public class CollegeController {
     // 검색 키워드에 따른 학교 검색
     @GetMapping("/college")
     public List<CollegeDto> selectCollegeList(@RequestParam(required = false) String search_keyword){
-        System.out.println(search_keyword);
         return collegeMapper.selectCollegeList(search_keyword);
     }
 
@@ -57,12 +56,12 @@ public class CollegeController {
         JsonNode rootNode1 = null;
         JsonNode contentNode1 = null;
 
-        HashMap<String, String> map;
+        HashMap<String, Object> map;
         for(JsonNode node : contentNode) {
             String schoolName = node.path("schoolName").asText();
             String address = node.path("adres").asText();
-            String latitude = "";
-            String longitude = "";
+            Double latitude = 0.0;
+            Double longitude = 0.0;
 
             /*
             * 3가지 경우
@@ -84,8 +83,8 @@ public class CollegeController {
                 contentNode1 = rootNode1.path("documents");
                 if (contentNode1.size() > 0) {
                     JsonNode campus = contentNode1.get(0);
-                    latitude = campus.path("y").asText();
-                    longitude = campus.path("x").asText();
+                    latitude =  Double.parseDouble(campus.path("y").asText());
+                    longitude =  Double.parseDouble(campus.path("x").asText());
                 }
                 // 코드를 합칠 경우, 좌표는 나오는데, 주소는 없는 경우가 있어서 우선 나눠둠.
             } else { // 2의 경우
@@ -96,8 +95,8 @@ public class CollegeController {
                 if (contentNode1.size() > 0) {
                     JsonNode campus = contentNode1.get(0);
                     address = campus.path("road_address_name").asText();
-                    latitude = campus.path("y").asText();
-                    longitude = campus.path("x").asText();
+                    latitude =  Double.parseDouble(campus.path("y").asText());
+                    longitude =  Double.parseDouble(campus.path("x").asText());
                 }
             }
             System.out.println("====================================");

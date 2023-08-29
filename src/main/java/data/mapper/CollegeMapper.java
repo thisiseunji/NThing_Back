@@ -10,5 +10,5 @@ import java.util.List;
 public interface CollegeMapper {
     CollegeDto selectCollegeById(Integer id);
     List<CollegeDto> selectCollegeList(String search_keyword);
-    public void insertCollege(HashMap<String, String> map);
+    void insertCollege(HashMap<String, Object> map);
 }

@@ -36,6 +36,9 @@ out/
 ### VS Code ###
 .vscode/
 
+### MAC ###
+.DS_Store
+
 application.yml
 
 application-API-KEY.properties

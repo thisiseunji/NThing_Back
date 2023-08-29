@@ -8,7 +8,7 @@
     <select id="selectCollegeList" resultType="CollegeDto" parameterType="String">
         select * from college
         <if test="search_keyword != null and !search_keyword.equals('')">
-            where name like CONCAT('%', ${search_keyword}, '%')
+            where name like CONCAT('%', '${search_keyword}', '%')
         </if>
     </select>
 

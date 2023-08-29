@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="data.mapper.UserMapper">
+    <select id="emailDuplicateCheck" resultType="data.dto.UserDto" parameterType="String">
+        SELECT * FROM user WHERE email = #{email}
+    </select>
+
+    <!-- 학교 없는건 수정했는데, 지금 왜 insert가 안되는거지??? -->
+    <!--  -->
+    <insert id="insertUser" parameterType="data.dto.UserDto" useGeneratedKeys="true" keyProperty="id">
+        insert into user (provider, provider_id, nickname, email, profile_image, subscription_date)
+        values (#{provider}, #{providerId}, #{nickname}, #{email}, #{profileImage}, now())
+    </insert>
+
+
+
+</mapper>

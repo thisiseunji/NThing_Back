@@ -1,18 +1,15 @@
 package data.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import lombok.Data;
-import org.apache.ibatis.type.Alias;
+import lombok.*;
 
 import java.sql.Timestamp;
 
 @Data
-@Alias("UserDto")
-@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 public class UserDto {
     private int id;
+    private String provider;
+    private String providerId;
     private String nickname;
     private String email;
     private String password;
