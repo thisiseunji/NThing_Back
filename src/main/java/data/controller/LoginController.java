@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 public class LoginController {
 
+    //autowired 추가함
+    @Autowired
     private final LoginService loginService;
 
     @Autowired
