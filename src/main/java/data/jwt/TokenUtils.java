@@ -30,8 +30,6 @@ public class TokenUtils {
     // 엑세스 토큰 생성
     public String generateJwtToken(UserDto userDto) {
 
-        System.out.println(SECRET_KEY);
-        System.out.println(REFRESH_KEY);
         return Jwts.builder()
                 .setSubject(userDto.getId()+"")
                 .setHeader(createHeader())
@@ -110,7 +108,7 @@ public class TokenUtils {
     // Payload 생성
     private Map<String, Object> createClaims(UserDto userDto) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put(DATA_KEY, userDto.getId()); // 왜 얘가 null이 들어갈까? 유틸을 갈아끼워야 하나?
+        claims.put(DATA_KEY, userDto.getId());
         return claims;
     }
 

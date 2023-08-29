@@ -11,12 +11,14 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.UUID;
 
-public class FileUploadUtil {
+import static java.util.Objects.requireNonNull;
+
+public class FileUtil {
 
     private static final String UPLOAD_DIR = "src/main/resources/static/uploads";
 
     public static String uploadFile(MultipartFile file) throws IOException {
-        String originalFilename = StringUtils.cleanPath(file.getOriginalFilename());
+        String originalFilename = StringUtils.cleanPath(requireNonNull(file.getOriginalFilename()));
         String fileName = generateUniqueFileName(originalFilename);
         Path uploadPath = Path.of(UPLOAD_DIR);
 
@@ -29,7 +31,6 @@ public class FileUploadUtil {
         try (InputStream inputStream = file.getInputStream()) {
             Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
         }
-
         return fileName;
     }
 
@@ -37,14 +38,13 @@ public class FileUploadUtil {
         File file = new File(UPLOAD_DIR+"/"+fileName);
 
         if(file.exists()) {
-            file.delete();
-            System.out.println(fileName+" file delete");
+            if(file.delete())
+                System.out.println(fileName+" delete");
         }
     }
 
     private static String generateUniqueFileName(String originalFilename) {
         String extension = StringUtils.getFilenameExtension(originalFilename);
-        String uniqueFileName = UUID.randomUUID().toString() + "." + extension;
-        return uniqueFileName;
+        return UUID.randomUUID() + "." + extension;
     }
 }
