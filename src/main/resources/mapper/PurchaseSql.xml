@@ -56,6 +56,19 @@
                     and b.user_id = #{user_id}
                     and b.purchase_id = a.id
             ) as is_liked
+            ,(
+                select
+                    save_name
+                from
+                    nthing.purchase_file
+                where
+                    true
+                    and purchase_id = a.id
+                    and delete_yn = false
+                order by
+                    id
+                limit 1
+            ) as image
         from
             nthing.purchase as a
         where

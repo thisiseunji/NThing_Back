@@ -63,6 +63,7 @@ public class PurchaseDto {
 
     @Getter
     @Builder
+    @Setter
     @AllArgsConstructor
     @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
     public static class Summary {
@@ -78,6 +79,7 @@ public class PurchaseDto {
         private String place;
         private boolean status;
         private boolean isLiked;
+        private String image;
     }
 
     @Getter
