@@ -29,8 +29,7 @@ public class UserService {
         this.tokenUtils = tokenUtils;
         this.jwtProvider = jwtProvider;
     }
-
-    // 로그인 관련 코드 로그인으로 옮기자
+    // 로그인 컨트롤러로 옮겨야함
     // ResponseEntity<Map<String, Object>> result = userService.socialLogin(params.get("kakaoAccessToken"));
     // public HashMap<String, Object> socialLogin(String kakaoAccessToken) {
     public ResponseEntity<Map<String, Object>> socialLogin(String kakaoAccessToken) {
