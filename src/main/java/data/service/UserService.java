@@ -29,9 +29,7 @@ public class UserService {
         this.tokenUtils = tokenUtils;
         this.jwtProvider = jwtProvider;
     }
-    // 로그인 컨트롤러로 옮겨야함
-    // ResponseEntity<Map<String, Object>> result = userService.socialLogin(params.get("kakaoAccessToken"));
-    // public HashMap<String, Object> socialLogin(String kakaoAccessToken) {
+    
     public ResponseEntity<Map<String, Object>> socialLogin(String kakaoAccessToken) {
 
         // HashMap<String, Object> result = new HashMap<>();
@@ -40,6 +38,7 @@ public class UserService {
         // 대강 이런식으로 넣으면 됨. 아니면 객체 생성해서 넣던지 ResponseEntity.ok(result)
         // 1. 유저 정보 가져오기 - 리턴 데이터 확인
         JsonNode jsonNode = getUserResource(kakaoAccessToken);
+        UserDto userDto = null;
 
         // 2. create or select
         if(!jsonNode.get("kakao_account").get("has_email").asText().equals("true")) {
@@ -47,8 +46,10 @@ public class UserService {
             // result.put({"message"...)
             result.put("message", "이메일 정보가 없습니다.");
             return new ResponseEntity<>(result, HttpStatus.NOT_FOUND);
-        } else { // 넘어온 이메일 정보가 있음
-            UserDto userDto = emailDuplicateCheck(jsonNode.get("kakao_account").get("email").asText());
+        } else { // 넘어온 이메일 정보가 있는 경우
+
+            userDto = emailDuplicateCheck(jsonNode.get("kakao_account").get("email").asText());
+
             if(userDto == null) { // 현재 가입되지 않은 사용자의 경우 insert => 명국님 코드로 cnt가 0 인 경우면,
                 userDto = new UserDto();
                 userDto.setProvider("kakao");
@@ -57,17 +58,16 @@ public class UserService {
                 userDto.setEmail(jsonNode.at("/kakao_account/email").asText());
                 userDto.setProfileImage(jsonNode.at("/properties/profile_image").asText());
 
-                int createdUserId = userMapper.insertUser(userDto);
-
                 userDto = emailDuplicateCheck(jsonNode.get("kakao_account").get("email").asText());
 
-                String accessToken = tokenUtils.generateJwtToken(userDto);
-                result.put("message", "카카오 로그인 성공");
-                result.put("accessToken", accessToken);
-
             }
-            return new ResponseEntity<>(result, HttpStatus.OK);
         }
+
+        String accessToken = tokenUtils.generateJwtToken(userDto);
+        result.put("message", "카카오 로그인 성공");
+        result.put("accessToken", accessToken);
+
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     // join과 통일 해야함 - 통일 전에 jwtTokenUtil에서 필요한 정보 확인할 것
