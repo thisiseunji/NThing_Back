@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="data.mapper.CommentMapper">
+    <insert id="createComment" parameterType="CommentDto">
+        insert into nthing.comment
+        (
+            content
+            ,is_private
+            ,created_at
+            ,user_id
+            ,purchase_id
+            ,parent_id
+        )
+        values
+        (
+            #{content}
+            ,#{isPrivate}
+            ,now()
+            ,#{userId}
+            ,#{purchaseId}
+            ,#{parentId}
+        )
+    </insert>
+    <select id="findCommentsByPurchaseId" resultType="CommentDto" parameterType="map">
+        select
+            id
+            ,content
+            ,is_private
+            ,created_at
+            ,updated_at
+            ,user_id
+            ,(select nickname from user where id=#{userId}) as nickname
+            ,purchase_id
+            ,parent_id
+        from
+            nthing.comment
+        where
+            is_delete = False
+            and purchase_id = #{purchaseId}
+    </select>
+    <select id="findRepliesByParentId" parameterType="int" resultType="CommentDto">
+        SELECT
+            *
+        FROM
+            nthing.comment
+        WHERE
+            parent_id = #{parentId}
+    </select>
+    <select id="findCommentById" parameterType="int" resultType="CommentDto">
+        SELECT
+            *
+        FROM
+            nthing.comment
+        WHERE
+            id = #{id}
+    </select>
+    <update id="updateComment" parameterType="CommentDto">
+        update nthing.comment set
+            content = #{content}
+            ,is_private = #{isPrivate}
+            ,updated_at = now()
+        where
+            id = #{id}
+    </update>
+    <delete id="deleteComment" parameterType="int">
+        update nthing.comment set
+            is_delete = True
+            ,updated_at = now()
+        where
+            id = #{id}
+    </delete>
+</mapper>
