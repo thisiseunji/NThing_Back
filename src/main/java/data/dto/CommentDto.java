@@ -18,7 +18,6 @@ import java.util.List;
 public class CommentDto {
     private int id;
     private String content;
-    private int level;
     @JsonProperty("is_private")
     private boolean isPrivate;
     @JsonProperty("is_delete")
