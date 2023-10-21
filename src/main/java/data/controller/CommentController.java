@@ -27,31 +27,19 @@ public class CommentController {
     public ResponseEntity<?> createComment(
             @RequestHeader("Authorization") String token,
             @RequestBody CommentDto commentDto
-    ){
-        if(commentDto.getContent() == null || commentDto.getContent().trim().isEmpty()) {
-            return ResponseEntity.badRequest().body("Comment content cannot be empty");
-        }
-
-        try {
-            int userId = jwtProvider.parseJwt(token);
-            commentDto.setUserId(userId);
-            commentService.createComment(commentDto);
-            return new ResponseEntity<>(HttpStatus.CREATED);
-        } catch (Exception e) {
-            return handleException(e);
-        }
+    ) {
+        int userId = jwtProvider.parseJwt(token);
+        commentDto.setUserId(userId);
+        commentService.createComment(commentDto);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @GetMapping("/purchase/{purchase_id}")
     public ResponseEntity<?> findCommentById(
             @PathVariable int purchase_id
-    ){
-        try {
-            List<CommentDto> comments = commentService.findCommentsByPurchaseId(purchase_id);
-            return ResponseEntity.ok(comments);
-        } catch (Exception e) {
-            return handleException(e);
-        }
+    ) {
+        List<CommentDto> comments = commentService.findCommentsByPurchaseId(purchase_id);
+        return ResponseEntity.ok(comments);
     }
 
     @PatchMapping("/{id}")
@@ -59,39 +47,20 @@ public class CommentController {
             @RequestHeader("Authorization") String token,
             @PathVariable int id,
             @RequestBody CommentDto commentDto
-    ){
-        if(commentDto.getContent() == null || commentDto.getContent().trim().isEmpty()) {
-            return ResponseEntity.badRequest().body("Comment content cannot be empty");
-        }
-
-        try {
-            int userId = jwtProvider.parseJwt(token);
-            commentDto.setId(id);
-            commentService.updateComment(userId, commentDto);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } catch (Exception e) {
-            return handleException(e);
-        }
+    ) {
+        int userId = jwtProvider.parseJwt(token);
+        commentDto.setId(id);
+        commentService.updateComment(userId, commentDto);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteComment(
             @RequestHeader("Authorization") String token,
             @PathVariable int id
-    ){
-        try {
-            int userId = jwtProvider.parseJwt(token);
-            commentService.deleteComment(userId, id);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } catch (Exception e) {
-            return handleException(e);
-        }
-    }
-
-    private ResponseEntity<?> handleException(Exception e) {
-        if (e instanceof IllegalArgumentException) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
-        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    ) {
+        int userId = jwtProvider.parseJwt(token);
+        commentService.deleteComment(userId, id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }
