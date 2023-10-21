@@ -1,34 +1,64 @@
 package data;
 
+import data.exception.*;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import data.exception.BusinessException;
-import data.exception.UnauthorizedException;
-import data.exception.NotFoundException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(NotFoundException.class)
-    public ResponseEntity<String> handleNotFoundException(NotFoundException e) {
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+    @ExceptionHandler(CommentNotFoundException.class)
+    public ResponseEntity<String> handleCommentNotFoundException(CommentNotFoundException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+    }
+
+    @ExceptionHandler(DeletedCommentException.class)
+    public ResponseEntity<String> handleDeletedCommentException(DeletedCommentException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+    }
+
+    @ExceptionHandler(MissingRequestHeaderException.class)
+    public ResponseEntity<String> handleMissingTokenException(MissingRequestHeaderException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body("Required request header 'Authorization' is missing");
+    }
+
+    @ExceptionHandler(PurchaseNotFoundException.class)
+    public ResponseEntity<String> handlePurchaseNotFoundException(PurchaseNotFoundException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
     }
 
     @ExceptionHandler(UnauthorizedException.class)
     public ResponseEntity<String> handleUnauthorizedException(UnauthorizedException e) {
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
     }
 
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<String> handleIllegalArgumentException(IllegalArgumentException e) {
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<String> handleUserNotFoundException(UserNotFoundException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
     }
 
-    @ExceptionHandler(BusinessException.class)
-    public ResponseEntity<String> handleBusinessException(BusinessException e) {
-        return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
+    @ExceptionHandler(ValidationException.class)
+    public ResponseEntity<String> handleValidationException(ValidationException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+    }
+
+    @ExceptionHandler(NullPointerException.class)
+    public ResponseEntity<String> handleNullPointerException(NullPointerException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Resource not found");
+    }
+
+    @ExceptionHandler(DataAccessException.class)
+    public ResponseEntity<String> handleDataAccessException(DataAccessException e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Database error");
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<String> handleGenericException(Exception e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal Server Error");
     }
 }
 
