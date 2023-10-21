@@ -1,10 +1,10 @@
 package data.service;
 
 import data.dto.CommentDto;
-import data.exception.BusinessException;
+import data.exception.CommentNotFoundException;
+import data.exception.DeletedCommentException;
 import data.exception.UnauthorizedException;
 import data.mapper.CommentMapper;
-import data.exception.NotFoundException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,7 +24,7 @@ public class CommentService {
         this.commentMapper = commentMapper;
     }
 
-    public void createComment(CommentDto commentDto){
+    public void createComment(CommentDto commentDto) {
         validateComment(commentDto);
         commentMapper.createComment(commentDto);
     }
@@ -42,7 +42,7 @@ public class CommentService {
         commentMapper.updateComment(commentDto);
     }
 
-    public void deleteComment(int loginId, int id){
+    public void deleteComment(int loginId, int id) {
         CommentDto existingComment = findExistingComment(id);
         validateUserPermission(loginId, existingComment.getUserId());
         validateIsDeleted(existingComment.isDelete());
@@ -58,7 +58,7 @@ public class CommentService {
     private CommentDto findExistingComment(int commentId) {
         CommentDto existingComment = commentMapper.findCommentById(commentId);
         if (existingComment == null) {
-            throw new NotFoundException("Comment not found");
+            throw new CommentNotFoundException("Comment not found");
         }
         return existingComment;
     }
@@ -71,7 +71,7 @@ public class CommentService {
 
     private void validateIsDeleted(boolean isDeleted) {
         if (isDeleted) {
-            throw new BusinessException("Cannot modify a deleted comment");
+            throw new DeletedCommentException("Cannot modify a deleted comment");
         }
     }
 
@@ -82,7 +82,7 @@ public class CommentService {
         for (CommentDto comment : allComments) {
             commentMap.put(comment.getId(), comment);
 
-            if(comment.getParentId() == 0) {
+            if (comment.getParentId() == 0) {
                 topLevelComments.add(comment);
             }
         }
