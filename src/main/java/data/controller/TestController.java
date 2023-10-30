@@ -13,8 +13,12 @@ public class TestController {
     @Autowired
     private JwtProvider jwtProvider;
 
-    @GetMapping("/token")
-    public String getTestToken() {
+    @GetMapping("/token/1")
+    public String getTestToken1() {
         return jwtProvider.createToken(1);
+    }
+    @GetMapping("/token/2")
+    public String getTestToken2() {
+        return jwtProvider.createToken(2);
     }
 }
