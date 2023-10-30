@@ -7,10 +7,10 @@ import java.util.List;
 
 @Mapper
 public interface CommentMapper {
-    int createComment(CommentDto commentDto);
-    List<CommentDto> findCommentsByPurchaseId(int purchase_id);
-    List<CommentDto> findRepliesByParentId(int parentId);
-    CommentDto findCommentById(int id);
-    void updateComment(CommentDto commentDto);
+    int createComment(CommentDto.Request comment);
+    List<CommentDto.Response> findCommentsByPurchaseId(int purchaseId);
+    List<CommentDto.Comment> findRepliesByParentId(int parentId);
+    CommentDto.Comment findCommentById(int id);
+    void updateComment(CommentDto.Request comment);
     void deleteComment(int id);
 }

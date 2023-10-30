@@ -26,7 +26,7 @@ public class CommentController {
     @PostMapping("")
     public ResponseEntity<?> createComment(
             @RequestHeader("Authorization") String token,
-            @RequestBody CommentDto commentDto
+            @RequestBody CommentDto.Request commentDto
     ) {
         int userId = jwtProvider.parseJwt(token);
         commentDto.setUserId(userId);
@@ -36,9 +36,15 @@ public class CommentController {
 
     @GetMapping("/purchase/{purchase_id}")
     public ResponseEntity<?> findCommentById(
+            @RequestHeader(value = "Authorization", required = false) String token,
             @PathVariable int purchase_id
     ) {
-        List<CommentDto> comments = commentService.findCommentsByPurchaseId(purchase_id);
+        int userId = 0;
+
+        if (token!=null) {
+            userId = jwtProvider.parseJwt(token);
+        }
+        List<CommentDto.Response> comments = commentService.findCommentsByPurchaseId(purchase_id, userId);
         return ResponseEntity.ok(comments);
     }
 
@@ -46,7 +52,7 @@ public class CommentController {
     public ResponseEntity<?> updateComment(
             @RequestHeader("Authorization") String token,
             @PathVariable int id,
-            @RequestBody CommentDto commentDto
+            @RequestBody CommentDto.Request commentDto
     ) {
         int userId = jwtProvider.parseJwt(token);
         commentDto.setId(id);
