@@ -19,7 +19,7 @@ public class LikeService {
         this.likeMapper = likeMapper;
     }
 
-    public void createLike(LikeDto likeDto){
+    public void createLike(LikeDto.Like likeDto){
         likeMapper.createLike(likeDto);
     }
 

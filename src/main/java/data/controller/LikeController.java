@@ -44,11 +44,11 @@ public class LikeController {
             Optional<Integer> likeIdOptional = likeService.findLikeIdByUserIdAndPurchaseId(userId, purchaseId);
             if (likeIdOptional.isPresent()) {
                 likeService.deleteLike(likeIdOptional.get());
-                return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+                return ResponseEntity.ok(new LikeDto.LikeResponse(false));
             } else {
-                LikeDto likeDto = buildLikeDtoFromTokenAndPurchaseId(token, purchaseId);
+                LikeDto.Like likeDto = buildLikeDtoFromTokenAndPurchaseId(token, purchaseId);
                 likeService.createLike(likeDto);
-                return ResponseEntity.status(HttpStatus.CREATED).build();
+                return ResponseEntity.ok(new LikeDto.LikeResponse(true));
             }
         } catch (Exception e) {
             return handleException(e);
@@ -61,11 +61,11 @@ public class LikeController {
         }
     }
 
-    private LikeDto buildLikeDtoFromTokenAndPurchaseId(String token, int purchaseId) {
+    private LikeDto.Like buildLikeDtoFromTokenAndPurchaseId(String token, int purchaseId) {
         PurchaseDto.Detail purchase = purchaseService.findPurchaseById(purchaseId);
         int purchaseIdFromDb = purchase.getId();
         int userId = jwtProvider.parseJwt(token);
-        LikeDto likeDto = new LikeDto();
+        LikeDto.Like likeDto = new LikeDto.Like();
         likeDto.setUserId(userId);
         likeDto.setPurchaseId(purchaseIdFromDb);
         return likeDto;
