@@ -60,7 +60,7 @@ public class UserService {
                 } else {
                     JwtToken jwtToken = JwtToken.builder().token(jwtProvider.createToken(id)).build();
 
-                    return new ResponseEntity<>(new MessageTokenDto("엑세스 토큰 재발급 요청 성공", jwtToken.getToken()), HttpStatus.OK);
+                    return new ResponseEntity<>(new MessageTokenDto("엑세스 토큰 재발급 요청 성공", jwtToken.getToken(), null), HttpStatus.OK);
                 }
             }
 
