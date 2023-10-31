@@ -15,7 +15,14 @@ public class LoginFilter implements Filter{
     @Autowired
     JwtProvider jwtProvider;
     // 로그인 검증에서 제외할 URI들
-    private static final String[] whitelist = {"/", "/login/*", "/favicon.ico", "/categories", "/college/*"}; // 추가 필요
+    private static final String[] whitelist = {
+            "/",
+            "/login/*",
+            "/favicon.ico",
+            "/test/*",
+            "/comment/purchase/*",
+            "/purchases"
+    }; // 추가 필요
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
