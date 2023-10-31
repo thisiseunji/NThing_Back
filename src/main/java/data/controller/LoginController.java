@@ -27,10 +27,11 @@ public class LoginController {
     }
 
     @PostMapping("/login/kakao")
-    // param : IdToken -> kakaoAccessToken
-    // 추가로 '메시지' 객체가 필요함
     public ResponseEntity<MessageTokenDto> kakaoLogin(@RequestBody IdToken token) {
+        System.out.println("카카오 로그인 컨트롤러");
         return loginService.kakaoLogin(token);
     }
+
+
 
 }

@@ -69,7 +69,7 @@ public class LoginService {
     }
 
     public ResponseEntity<MessageTokenDto> kakaoLogin(IdToken token) {
-
+        System.out.println("카카오 로그인 서비스");
         // 카카오에 정보 요청
         String kakaoAccesstoken = token.getIdToken();
         JsonNode userInfo = getUserInfo(kakaoAccesstoken);
@@ -78,11 +78,11 @@ public class LoginService {
             // 사용자의 이메일 정보가 없는 경우 -> 오류
             return new ResponseEntity<>(new MessageTokenDto("이메일 정보 없음", null), HttpStatus.NOT_FOUND);
         }
-
+        UserDto userDto = new UserDto();
         // 가입된 사용자가 아닌 경우
         if(!duplicatedEmail(userInfo.get("kakao_account").get("email").asText())) {
             // 현재 가입되지 않은 사용자의 경우 -> 회원가입
-            UserDto userDto = UserDto.builder()
+            userDto = UserDto.builder()
                     .provider("kakao")
                     .providerId(userInfo.at("/id").asText())
                     .nickname(userInfo.at("/kakao_account/profile/nickname").asText())
@@ -94,6 +94,12 @@ public class LoginService {
 
         //로그인
         int findId = userMapper.findByEmail(userInfo.get("kakao_account").get("email").asText());
+
+        JwtToken refreshToken = JwtToken.builder().token(jwtProvider.createRefreshToken(findId)).build();
+        userDto.setId(findId);
+        userDto.setRefreshToken(refreshToken.getToken());
+        userMapper.updateRefreshToken(userDto);
+
         JwtToken jwtToken = JwtToken.builder().token(jwtProvider.createToken(findId)).build();
 
         return new ResponseEntity<>(new MessageTokenDto("카카오 로그인 성공", jwtToken.getToken()), HttpStatus.OK);
@@ -119,6 +125,7 @@ public class LoginService {
             throw new RuntimeException("Kakao API 호출 중 오류 발생: " + statusCode);
         }
 
+        System.out.println(response.getBody());
         return response.getBody();
     }
 

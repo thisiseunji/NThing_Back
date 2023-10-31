@@ -26,4 +26,5 @@ public class UserDto {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private Timestamp subscriptionDate;
     private int collegeId;
+    private String refreshToken;
 }

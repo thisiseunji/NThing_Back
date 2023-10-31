@@ -36,12 +36,50 @@ public class JwtProvider {
                 .compact();
     }
 
+    // 리프레시 토큰 생성
+    public String createRefreshToken(int loginId) {
+        Claims claims = Jwts.claims();
+        claims.put("loginId",loginId);
+
+        Date now = new Date();
+        Date expiration = new Date(now.getTime() + Duration.ofDays(30).toMillis()); // 만료기간 30일
+
+        return Jwts.builder()
+                .setHeaderParam(Header.TYPE, Header.JWT_TYPE) // (1)
+                .setIssuer("test") // 토큰발급자(iss)
+                .setIssuedAt(now) // 발급시간(iat)
+                .setExpiration(expiration) // 만료시간(exp)
+                .setClaims(claims)
+                .signWith(SignatureAlgorithm.HS256, secret) // 알고리즘, 시크릿 키
+                .compact();
+    }
+
     public int parseJwt(String token) {
         return Jwts.parser()
                 .setSigningKey(secret)
                 .parseClaimsJws(BearerRemove(token))
                 .getBody()
                 .get("loginId", Integer.class);
+    }
+
+    // 토큰 유효성 확인(리프레시 토큰도 마찬가지)
+    public boolean isValidToken(String token) {
+        Claims claims = Jwts.parser()
+                            .setSigningKey(secret)
+                            .parseClaimsJws(BearerRemove(token))
+                            .getBody();
+        return claims.getExpiration().after(new Date());
+    }
+
+    public String getIdFromToken(String token) {
+        return (String) getClaims(token).get("loginId");
+    }
+
+    private Claims getClaims(String token) {
+        return Jwts.parser()
+                  .setSigningKey(secret)
+                  .parseClaimsJws(token)
+                  .getBody();
     }
 
     private String BearerRemove(String token) {
