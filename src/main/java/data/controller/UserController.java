@@ -1,12 +1,15 @@
 package data.controller;
 
+import data.dto.MessageTokenDto;
 import data.dto.PurchaseDto;
+import data.dto.UserDto;
 import data.exception.UserNotFoundException;
+import data.service.UserService;
 import data.service.LikeService;
 import data.util.JwtProvider;
+
 import lombok.extern.slf4j.Slf4j;
-import data.dto.UserDto;
-import data.service.UserService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -51,5 +54,11 @@ public class UserController {
     public ResponseEntity<Void> deleteUser(@RequestHeader("Authorization") String token) {
         userService.deleteUser(token);
         return ResponseEntity.noContent().build();
+    }
+
+    // 리프레시 토큰 검증
+    @PostMapping("/reToken")
+    public ResponseEntity<MessageTokenDto> checkRefreshToken(@RequestHeader("Authorization") String token) {
+        return userService.checkRefreshToken(token);
     }
 }

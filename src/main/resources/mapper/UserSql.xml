@@ -72,4 +72,16 @@
         where
             id = #{id}
     </delete>
+    
+    <select id="getTokenById" parameterType="int">
+        select refresh_token
+        from user
+        where id= #{id}
+    </select>
+
+    <update id="updateRefreshToken" parameterType="UserDto">
+        update user
+        set refresh_token = #{refreshToken}
+        where id = #{id}
+    </update>
 </mapper>

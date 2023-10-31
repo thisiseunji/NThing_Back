@@ -14,4 +14,7 @@ public interface UserMapper {
     int findByEmail(String email);
     boolean isValidEmail(String email);
     void deleteUser(int id);
+
+    String getTokenById(int id);
+    void updateRefreshToken(UserDto userDto);
 }
