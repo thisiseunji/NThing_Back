@@ -1,18 +1,14 @@
 package data.service;
 
 import data.dto.CommentDto;
-import data.exception.BusinessException;
+import data.exception.CommentNotFoundException;
+import data.exception.DeletedCommentException;
 import data.exception.UnauthorizedException;
 import data.mapper.CommentMapper;
-import data.exception.NotFoundException;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class CommentService {
@@ -24,41 +20,49 @@ public class CommentService {
         this.commentMapper = commentMapper;
     }
 
-    public void createComment(CommentDto commentDto){
+    public void createComment(CommentDto.Request commentDto) {
         validateComment(commentDto);
         commentMapper.createComment(commentDto);
     }
 
-    public List<CommentDto> findCommentsByPurchaseId(int purchaseId) {
-        List<CommentDto> allComments = commentMapper.findCommentsByPurchaseId(purchaseId);
-        return organizeComments(allComments);
+    public List<CommentDto.Response> findCommentsByPurchaseId(int purchaseId, int userId) {
+        List<CommentDto.Response> allComments = commentMapper.findCommentsByPurchaseId(purchaseId);
+        return organizeComments(allComments, userId);
     }
 
-    public void updateComment(int loginId, CommentDto commentDto) {
-        CommentDto existingComment = findExistingComment(commentDto.getId());
-        validateUserPermission(loginId, existingComment.getUserId());
+    public void updateComment(int userId, CommentDto.Request commentDto) {
+        CommentDto.Comment comment = new CommentDto.Comment();
+        comment.setId(commentDto.getId());
+        comment.setContent(commentDto.getContent());
+        comment.setIsPrivate(commentDto.getIsPrivate());
+        comment.setUserId(userId);
+        comment.setPurchaseId(commentDto.getPurchaseId());
+        comment.setParentId(commentDto.getParentId());
+
+        CommentDto.Comment existingComment = findExistingComment(comment.getId());
+        validateUserPermission(userId, existingComment.getUserId());
         validateComment(commentDto);
         validateIsDeleted(existingComment.isDelete());
         commentMapper.updateComment(commentDto);
     }
 
-    public void deleteComment(int loginId, int id){
-        CommentDto existingComment = findExistingComment(id);
+    public void deleteComment(int loginId, int id) {
+        CommentDto.Comment existingComment = findExistingComment(id);
         validateUserPermission(loginId, existingComment.getUserId());
         validateIsDeleted(existingComment.isDelete());
         commentMapper.deleteComment(id);
     }
 
-    private void validateComment(CommentDto commentDto) {
+    private void validateComment(CommentDto.Request commentDto) {
         if (commentDto == null || commentDto.getContent() == null || commentDto.getContent().trim().isEmpty()) {
             throw new IllegalArgumentException("Comment content cannot be empty");
         }
     }
 
-    private CommentDto findExistingComment(int commentId) {
-        CommentDto existingComment = commentMapper.findCommentById(commentId);
+    private CommentDto.Comment findExistingComment(int commentId) {
+        CommentDto.Comment existingComment = commentMapper.findCommentById(commentId);
         if (existingComment == null) {
-            throw new NotFoundException("Comment not found");
+            throw new CommentNotFoundException("Comment not found");
         }
         return existingComment;
     }
@@ -71,25 +75,33 @@ public class CommentService {
 
     private void validateIsDeleted(boolean isDeleted) {
         if (isDeleted) {
-            throw new BusinessException("Cannot modify a deleted comment");
+            throw new DeletedCommentException("Cannot modify a deleted comment");
         }
     }
 
-    private List<CommentDto> organizeComments(List<CommentDto> allComments) {
-        Map<Integer, CommentDto> commentMap = new HashMap<>();
-        List<CommentDto> topLevelComments = new ArrayList<>();
+    private List<CommentDto.Response> organizeComments(List<CommentDto.Response> allComments, int userId) {
+        Map<Integer, CommentDto.Response> commentMap = new HashMap<>();
+        List<CommentDto.Response> topLevelComments = new ArrayList<>();
 
-        for (CommentDto comment : allComments) {
+        for (CommentDto.Response comment : allComments) {
             commentMap.put(comment.getId(), comment);
 
-            if(comment.getParentId() == 0) {
+            if (comment.getParentId() == 0) {
                 topLevelComments.add(comment);
             }
+
+            if (comment.getIsPrivate() && comment.getUserId() != userId) {
+                if (comment.getUserId() != userId) {
+                    comment.setNickname(comment.getNickname().charAt(0) + "**");
+                    comment.setContent("");
+                }
+            }
+            comment.setReplies(new ArrayList<>());
         }
 
-        for (CommentDto comment : allComments) {
+        for (CommentDto.Response comment : allComments) {
             if (comment.getParentId() != 0) {
-                CommentDto parentComment = commentMap.get(comment.getParentId());
+                CommentDto.Response parentComment = commentMap.get(comment.getParentId());
                 if (parentComment != null) {
                     if (parentComment.getReplies() == null) {
                         parentComment.setReplies(new ArrayList<>());

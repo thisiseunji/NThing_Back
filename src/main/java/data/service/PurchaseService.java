@@ -2,6 +2,7 @@ package data.service;
 
 import data.dto.FileDto;
 import data.dto.PurchaseDto;
+import data.exception.PurchaseNotFoundException;
 import data.mapper.FileMapper;
 import data.mapper.PurchaseMapper;
 import data.util.MultiFileUtils;
@@ -39,7 +40,7 @@ public class PurchaseService {
         PurchaseDto.Detail detail = purchaseMapper.findPurchaseById(id);
 
         if (detail == null)
-            return  null;
+            throw new PurchaseNotFoundException("Purchase not found for ID: " + id);
 
         List<FileDto.Response> images = fileMapper.findAllByPurchaseId(id);
 

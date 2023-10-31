@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="data.mapper.LikeMapper">
+    <insert id="createLike" parameterType="data.dto.LikeDto$Like">
+        insert into nthing.`like` (user_id, purchase_id)
+        values (#{userId}, #{purchaseId})
+    </insert>
+    <select id="findLikedPurchasesByUserId" parameterType="int" resultType="data.dto.PurchaseDto$Summary">
+        select a.id, a.title, a.latitude, a.longitude, a.date, a.denominator, a.numerator, a.price, a.place, a.status
+             ,(
+                select count(*)
+                from nthing.like b
+                where true
+                    and b.user_id = #{user_id}
+                    and b.purchase_id = a.id
+            ) as is_liked
+            ,(
+                select save_name
+                from nthing.purchase_file
+                where true
+                    and purchase_id = a.id
+                    and delete_yn = false
+                order by id
+                limit 1
+            ) as image
+        from nthing.purchase as a
+        where id in (select purchase_id from nthing.like where #{user_id})
+            and a.delete_yn = 0
+            <if test="search_keyword != null and search_keyword != ''">
+                and a.title like CONCAT('%',#{search_keyword},'%')
+            </if>
+        <if test="sort != null and sort != ''">
+            order by ${sort}
+        </if>
+    </select>
+    <select id="findLikeIdByUserIdAndPurchaseId" parameterType="map" resultType="java.lang.Integer">
+        select id
+        from nthing.`like`
+        where user_id = #{user_id}
+            and purchase_id = #{purchase_id}
+    </select>
+    <delete id="deleteLike" parameterType="int">
+        delete from nthing.`like`
+        where id = #{id}
+    </delete>
+</mapper>
