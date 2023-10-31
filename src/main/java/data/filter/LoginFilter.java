@@ -21,7 +21,10 @@ public class LoginFilter implements Filter{
             "/favicon.ico",
             "/test/*",
             "/comment/purchase/*",
-            "/purchases"
+            "/purchases",
+            "/categories",
+            "/college",
+            "/college/*"
     }; // 추가 필요
 
     @Override
