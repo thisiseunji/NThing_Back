@@ -76,7 +76,7 @@ public class LoginService {
 
         if(!userInfo.get("kakao_account").get("has_email").asText().equals("true")) {
             // 사용자의 이메일 정보가 없는 경우 -> 오류
-            return new ResponseEntity<>(new MessageTokenDto("이메일 정보 없음", null), HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(new MessageTokenDto("이메일 정보 없음", null, null), HttpStatus.NOT_FOUND);
         }
         UserDto userDto = new UserDto();
         // 가입된 사용자가 아닌 경우
@@ -102,7 +102,7 @@ public class LoginService {
 
         JwtToken jwtToken = JwtToken.builder().token(jwtProvider.createToken(findId)).build();
 
-        return new ResponseEntity<>(new MessageTokenDto("카카오 로그인 성공", jwtToken.getToken()), HttpStatus.OK);
+        return new ResponseEntity<>(new MessageTokenDto("카카오 로그인 성공", jwtToken.getToken(), refreshToken.getToken()), HttpStatus.OK);
     }
 
     // 유저정보 요청(카카오)
