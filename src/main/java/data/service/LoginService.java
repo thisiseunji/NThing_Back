@@ -114,6 +114,7 @@ public class LoginService {
         int findId = userMapper.findByEmail(userInfo.get("kakao_account").get("email").asText());
 
         JwtToken refreshToken = JwtToken.builder().token(jwtProvider.createRefreshToken(findId)).build();
+
         userDto.setId(findId);
         userDto.setRefreshToken(refreshToken.getToken());
         userMapper.updateRefreshToken(userDto);
