@@ -2,7 +2,6 @@ package data.filter;
 
 import data.exception.UnauthorizedException;
 import data.util.JwtProvider;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.PatternMatchUtils;
 
 import javax.servlet.*;

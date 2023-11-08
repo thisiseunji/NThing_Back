@@ -19,7 +19,6 @@ public class JwtProvider {
         this.secret = Base64.getEncoder().encodeToString(secret.getBytes());
     }
 
-
     public String createToken(int loginId) {
         Claims claims = Jwts.claims();
         claims.put("loginId",loginId);
@@ -66,7 +65,6 @@ public class JwtProvider {
 
     // 토큰 유효성 확인(리프레시 토큰도 마찬가지)
     public boolean isValidToken(String token) {
-        System.out.println("token : " + token);
 
         Claims claims = Jwts.parser()
                             .setSigningKey(secret)

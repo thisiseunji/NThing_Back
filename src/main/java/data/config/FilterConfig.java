@@ -12,6 +12,7 @@ public class FilterConfig {
 
     @Autowired
     JwtProvider jwtprovider;
+
     @Bean
     public FilterRegistrationBean<LoginFilter> loginFilter() {
         FilterRegistrationBean<LoginFilter> registrationBean = new FilterRegistrationBean<>();
