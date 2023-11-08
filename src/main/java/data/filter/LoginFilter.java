@@ -12,8 +12,11 @@ import java.io.IOException;
 
 public class LoginFilter implements Filter{
 
-    @Autowired
-    JwtProvider jwtProvider;
+    private JwtProvider jwtProvider;
+    public LoginFilter(JwtProvider jwtProvider) {
+        this.jwtProvider = jwtProvider;
+    }
+
     // 로그인 검증에서 제외할 URI들
     private static final String[] whitelist = {
             "/",

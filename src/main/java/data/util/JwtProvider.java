@@ -15,9 +15,10 @@ public class JwtProvider {
     private final String secret;
 
     @Autowired
-    public JwtProvider(@Value("${jwt.secret}") String secret) {
+    public JwtProvider(@Value("${jwt.secret:defaultSecretValue}") String secret) {
         this.secret = Base64.getEncoder().encodeToString(secret.getBytes());
     }
+
 
     public String createToken(int loginId) {
         Claims claims = Jwts.claims();
@@ -41,7 +42,6 @@ public class JwtProvider {
         Claims claims = Jwts.claims();
         claims.put("loginId",loginId);
 
-        
         Date now = new Date();
         Date expiration = new Date(now.getTime() + Duration.ofDays(30).toMillis()); // 만료기간 30일
         claims.put("expiration", expiration);
@@ -67,6 +67,7 @@ public class JwtProvider {
     // 토큰 유효성 확인(리프레시 토큰도 마찬가지)
     public boolean isValidToken(String token) {
         System.out.println("token : " + token);
+
         Claims claims = Jwts.parser()
                             .setSigningKey(secret)
                             .parseClaimsJws(BearerRemove(token))
