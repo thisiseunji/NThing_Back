@@ -42,9 +42,7 @@ public class LoginFilter implements Filter{
         String accessToken = httpRequest.getHeader("Authorization");
 
         if(isLoginCheckPath(requestURI)) { // 검증해야하는 URI인 경우
-            System.out.println(requestURI);
             if (accessToken != null) { // 엑세스 토큰이 null이 아니면
-                System.out.println("requestURI: " +requestURI);
                 if (!jwtProvider.isValidToken(accessToken)) { // 유효하지 않은 토큰의 경우
                     throw new UnauthorizedException("유효하지 않은 토큰");
                 }
@@ -52,7 +50,6 @@ public class LoginFilter implements Filter{
                 throw new UnauthorizedException("토큰 정보 없음");
             }
         }
-        System.out.println("필터통과");
         chain.doFilter(request, response);
     }
 

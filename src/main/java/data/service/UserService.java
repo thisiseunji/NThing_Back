@@ -52,7 +52,7 @@ public class UserService {
             if (!jwtProvider.isValidToken(token)) {
                 throw new UnauthorizedException("유효하지 않은 토큰");
             } else  {
-                int id = Integer.parseInt(jwtProvider.getIdFromToken(token));
+                int id = jwtProvider.parseJwt(token);
                 // 저장된 리프레시 토큰과 비교
                 String saved_token = userMapper.getTokenById(id);
                 if (!saved_token.equals(token)) {
