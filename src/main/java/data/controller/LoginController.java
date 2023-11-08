@@ -2,10 +2,10 @@ package data.controller;
 
 import com.google.firebase.auth.FirebaseAuthException;
 import data.dto.IdToken;
-import data.dto.JwtToken;
 import data.dto.MessageTokenDto;
 import data.service.LoginService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,8 +22,12 @@ public class LoginController {
     }
 
     @PostMapping("/login/google")
-    public JwtToken googleLogin(@RequestBody IdToken token) throws FirebaseAuthException {
-        return loginService.login(token);
+    public ResponseEntity<MessageTokenDto> googleLogin(@RequestBody IdToken token) {
+        try {
+            return new ResponseEntity<>(loginService.googleLogin(token), HttpStatus.OK);
+        } catch (FirebaseAuthException e) {
+            return new ResponseEntity<>(new MessageTokenDto("구글 로그인 실패", null, null), HttpStatus.BAD_REQUEST);
+        }
     }
 
     @PostMapping("/login/kakao")

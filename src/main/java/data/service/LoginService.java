@@ -27,29 +27,48 @@ public class LoginService {
         this.jwtProvider = jwtProvider;
     }
 
-    public JwtToken login(IdToken token) throws FirebaseAuthException {
 
-        String idToken = token.getIdToken();
-        FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(idToken);
+    public MessageTokenDto googleLogin(IdToken token) throws FirebaseAuthException {
+        try {
+            String idToken = token.getIdToken();
+            FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(idToken);
 
-        if (duplicatedEmail(decodedToken.getEmail())) {
-            System.out.println("로그인");
-            int findId = userMapper.findByEmail(decodedToken.getEmail());
-            return JwtToken.builder()
-                    .token(jwtProvider.createToken(findId))
-                    .build();
-        } else {
-            System.out.println("회원가입");
-            return JwtToken.builder()
-                    .token(signUp(decodedToken))
-                    .build();
+            if (duplicatedEmail(decodedToken.getEmail())) {
+                System.out.println("로그인");
+                return handleLoginSuccess(decodedToken);
+            } else {
+                System.out.println("회원가입");
+                return handleSignupSuccess(decodedToken);
+            }
+        } catch (FirebaseAuthException e) {
+            return new MessageTokenDto("구글 로그인 성공", null, null);
         }
     }
 
+    private MessageTokenDto handleLoginSuccess(FirebaseToken decodedToken) {
+        int findId = userMapper.findByEmail(decodedToken.getEmail());
+        UserDto userDto = userMapper.findById(findId);
+        JwtToken refreshToken = JwtToken.builder().token(jwtProvider.createRefreshToken(findId)).build();
+        userDto.setId(findId);
+        userDto.setRefreshToken(refreshToken.getToken());
+        userMapper.updateRefreshToken(userDto);
+        JwtToken jwtToken = JwtToken.builder().token(jwtProvider.createToken(findId)).build();
+
+        return new MessageTokenDto("구글 로그인 성공", jwtToken.getToken(), refreshToken.getToken());
+    }
+
+    private MessageTokenDto handleSignupSuccess(FirebaseToken decodedToken) {
+        JwtToken refreshToken = JwtToken.builder().token(signUp(decodedToken)).build();
+        int findId = jwtProvider.parseJwt(refreshToken.getToken());
+        UserDto userDto = userMapper.findById(findId);
+        userDto.setRefreshToken(refreshToken.getToken());
+        JwtToken jwtToken = JwtToken.builder().token(signUp(decodedToken)).build();
+
+        return new MessageTokenDto("구글 로그인 성공", jwtToken.getToken(), refreshToken.getToken());
+    }
+
     public String signUp(FirebaseToken decodedToken) {
-
         String identity = decodedToken.getClaims().get("firebase").toString();
-
         String provider = identity.split("sign_in_provider=")[1].split("\\.")[0];
         String providerId = identity.split("google.com=\\[")[1].split("]")[0];
 
