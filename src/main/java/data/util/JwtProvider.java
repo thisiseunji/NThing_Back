@@ -41,6 +41,7 @@ public class JwtProvider {
         Claims claims = Jwts.claims();
         claims.put("loginId",loginId);
 
+        
         Date now = new Date();
         Date expiration = new Date(now.getTime() + Duration.ofDays(30).toMillis()); // 만료기간 30일
         claims.put("expiration", expiration);
