@@ -2,7 +2,6 @@ package data.filter;
 
 import data.exception.UnauthorizedException;
 import data.util.JwtProvider;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.PatternMatchUtils;
 
 import javax.servlet.*;
@@ -12,8 +11,11 @@ import java.io.IOException;
 
 public class LoginFilter implements Filter{
 
-    @Autowired
-    JwtProvider jwtProvider;
+    private JwtProvider jwtProvider;
+    public LoginFilter(JwtProvider jwtProvider) {
+        this.jwtProvider = jwtProvider;
+    }
+
     // 로그인 검증에서 제외할 URI들
     private static final String[] whitelist = {
             "/",
