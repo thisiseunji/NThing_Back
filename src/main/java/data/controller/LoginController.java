@@ -32,10 +32,6 @@ public class LoginController {
 
     @PostMapping("/login/kakao")
     public ResponseEntity<MessageTokenDto> kakaoLogin(@RequestBody IdToken token) {
-        System.out.println("카카오 로그인 컨트롤러");
         return loginService.kakaoLogin(token);
     }
-
-
-
 }

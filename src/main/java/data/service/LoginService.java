@@ -88,8 +88,7 @@ public class LoginService {
     }
 
     public ResponseEntity<MessageTokenDto> kakaoLogin(IdToken token) {
-        System.out.println("카카오 로그인 서비스");
-        // 카카오에 정보 요청
+        // 카카오에 사용자 정보 요청
         String kakaoAccesstoken = token.getIdToken();
         JsonNode userInfo = getUserInfo(kakaoAccesstoken);
 
@@ -115,6 +114,7 @@ public class LoginService {
         int findId = userMapper.findByEmail(userInfo.get("kakao_account").get("email").asText());
 
         JwtToken refreshToken = JwtToken.builder().token(jwtProvider.createRefreshToken(findId)).build();
+
         userDto.setId(findId);
         userDto.setRefreshToken(refreshToken.getToken());
         userMapper.updateRefreshToken(userDto);
