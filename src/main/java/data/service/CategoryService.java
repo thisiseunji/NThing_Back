@@ -20,9 +20,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class CategoryService {
 
-    @Value("${local-path-test}")
-    private String urlPath;
-
     private final CategoryMapper categoryMapper;
     private final MultiFileUtils multiFileUtils;
     private final HttpServletRequest request;
