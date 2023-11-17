@@ -27,7 +27,7 @@ public class LoginFilter implements Filter{
             "/categories",
             "/college",
             "/college/*",
-            "/uploads/*",
+            "/file/*",
             "/category"
     }; // 추가 필요
 
