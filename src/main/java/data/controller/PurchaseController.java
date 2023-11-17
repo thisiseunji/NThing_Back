@@ -30,7 +30,7 @@ public class PurchaseController {
     @PostMapping("/purchase")
     public void createPurchase(PurchaseDto.Request purchaseRequest) {
         int id = purchaseService.createPurchase(purchaseRequest);
-        List<FileDto.Request> files = multiFileUtils.uploadFiles(purchaseRequest.getFiles());
+        List<FileDto.Request> files = multiFileUtils.uploadFiles(purchaseRequest.getFiles(), "purchase");
         fileService.saveFiles(id, files);
     }
 
@@ -63,7 +63,7 @@ public class PurchaseController {
         // 4. 파일 삭제 (from database)
         fileService.deleteAllFileByIds(fileService.findAllIdsByPurchaseId(purchaseRequest.getId()));
         // 5. 파일 업로드 (to disk)
-        List<FileDto.Request> uploadFiles = multiFileUtils.uploadFiles(purchaseRequest.getFiles());
+        List<FileDto.Request> uploadFiles = multiFileUtils.uploadFiles(purchaseRequest.getFiles(), "purchase");
         // 6. 파일 정보 저장 (to database)
         fileService.saveFiles(purchaseRequest.getId(), uploadFiles);
     }

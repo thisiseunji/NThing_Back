@@ -1,11 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="data.mapper.CategoryMapper">
+    <insert id="createCategory" parameterType="categoryDto">
+        insert into nthing.category (name, image)
+        values (#{name}, #{image})
+    </insert>
     <select id="findAllCategory" resultType="data.dto.CategoryDto">
-        select
-            id
-            ,name
-        from
-            category
+        select id, name, image
+        from category
+    </select>
+    <select id="existsByName" parameterType="string" resultType="boolean">
+        select count(*) > 0 as isExist
+        from category
+        where name = #{name}
     </select>
 </mapper>

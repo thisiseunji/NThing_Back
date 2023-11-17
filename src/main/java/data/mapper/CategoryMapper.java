@@ -7,5 +7,7 @@ import java.util.List;
 
 @Mapper
 public interface CategoryMapper {
+    void createCategory(CategoryDto categoryDto);
     List<CategoryDto> findAllCategory();
+    boolean existsByName(String name);
 }
