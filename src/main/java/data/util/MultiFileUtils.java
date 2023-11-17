@@ -20,24 +20,24 @@ import java.util.UUID;
 @Component
 public class MultiFileUtils {
 
-    @Value("${upload-path}")
+    @Value("${upload-path-test}")
     private String uploadPath;
 
-    @Value("${local-image-path}")
-    private String localImagePath;
+    @Value("${local-path-test}")
+    private String urlPath;
 
     /**
      * 다중 파일 업로드
      * @param multipartFiles - 파일 객체 List
      * @return DB에 저장할 파일 정보 List
      */
-    public List<FileDto.Request> uploadFiles(final List<MultipartFile> multipartFiles) {
+    public List<FileDto.Request> uploadFiles(final List<MultipartFile> multipartFiles, String saveRoute) {
         List<FileDto.Request> files = new ArrayList<>();
         for (MultipartFile multipartFile : multipartFiles) {
             if (multipartFile.isEmpty()) {
                 continue;
             }
-            files.add(uploadFile(multipartFile));
+            files.add(uploadFile(multipartFile, saveRoute));
         }
         return files;
     }
@@ -47,15 +47,14 @@ public class MultiFileUtils {
      * @param multipartFile - 파일 객체
      * @return DB에 저장할 파일 정보
      */
-    public FileDto.Request uploadFile(final MultipartFile multipartFile) {
+    public FileDto.Request uploadFile(final MultipartFile multipartFile, String saveRoute) {
 
         if (multipartFile.isEmpty()) {
             return null;
         }
 
         String saveName = generateSaveFilename(multipartFile.getOriginalFilename());
-        String today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyMMdd")).toString();
-        String uploadPath = getUploadPath(today) + File.separator + saveName;
+        String uploadPath = getUploadPath(saveRoute) + File.separator + saveName;
         File uploadFile = new File(uploadPath);
 
         try {
@@ -66,7 +65,7 @@ public class MultiFileUtils {
 
         return FileDto.Request.builder()
                 .original_name(multipartFile.getOriginalFilename())
-                .save_name(saveName)
+                .save_name(saveRoute+"/"+saveName)
                 .size((int) multipartFile.getSize())
                 .build();
     }
@@ -81,7 +80,7 @@ public class MultiFileUtils {
         SimpleDateFormat format = new SimpleDateFormat("yyMMdd");
 
         for (FileDto.Response image : imageList) {
-            String filePath = localImagePath + format.format(image.getCreatedDate()) + "/" + image.getSaveName();
+            String filePath = urlPath + "/" + image.getSaveName();
             filePathList.add(filePath);
         }
 

@@ -26,7 +26,9 @@ public class LoginFilter implements Filter{
             "/purchases",
             "/categories",
             "/college",
-            "/college/*"
+            "/college/*",
+            "/uploads/*",
+            "/category"
     }; // 추가 필요
 
     @Override
