@@ -21,7 +21,6 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class MultiFileUtils {
 
-    private final HttpServletRequest request;
     private final UploadPathConfig uploadPathConfig;
 
     /**
@@ -68,24 +67,23 @@ public class MultiFileUtils {
 
     /**
      * 파일 로컬 경로 변환
-     * @param imageList - image_name list
-     * @return - image_file_path list
+     * @param fileList 파일 리스트
+     * @return 파일명 수정된 파일 리스트
      */
-    public List<String> generateFilePath(List<FileDto.Response> imageList) {
-        List<String> filePathList = new ArrayList<>();
+    public List<FileDto.Response> generateFilePath(List<FileDto.Response> fileList) {
+        List<FileDto.Response> generatedFileList = new ArrayList<>();
 
-        for (FileDto.Response image : imageList) {
-            String filePath = getDomain() + "/" + image.getSaveName();
-            filePathList.add(filePath);
+        for (FileDto.Response file : fileList) {
+            file.setSaveName(getDomain() + file.getSaveName());
+            generatedFileList.add(file);
         }
-
-        return filePathList;
+        return generatedFileList;
     }
 
     /**
      * 저장 파일명 생성
      * @param filename 원본 파일명
-     * @return 디스크에 저장할 파일명
+     * @return 로컬에 저장할 파일명
      */
     private String generateSaveFilename(final String filename) {
         String uuid = UUID.randomUUID().toString().replaceAll("-", "");
@@ -121,11 +119,14 @@ public class MultiFileUtils {
         }
     }
 
-    private String getDomain() {
+    public String getDomain() {
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         if (attributes != null) {
             HttpServletRequest request = attributes.getRequest();
-            return request.getRequestURI().toString();
+            String scheme = request.getScheme();
+            String serverName = request.getServerName();
+            int serverPort = request.getServerPort();
+            return scheme + "://" + serverName + ":" + serverPort + "/" + "file/";
         }
         return "";
     }
