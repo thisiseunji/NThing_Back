@@ -2,79 +2,109 @@ package data;
 
 import data.dto.ErrorResponse;
 import data.exception.*;
-import org.springframework.dao.DataAccessException;
+import data.exception.NullPointerException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(CommentNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleCommentNotFoundException(CommentNotFoundException e) {
-        ErrorResponse errorResponse = new ErrorResponse(e.getMessage(), HttpStatus.NOT_FOUND.value(), "COMMENT_NOT_FOUND");
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
-    }
-
-    @ExceptionHandler(DeletedCommentException.class)
-    public ResponseEntity<ErrorResponse> handleDeletedCommentException(DeletedCommentException e) {
-        ErrorResponse errorResponse = new ErrorResponse(e.getMessage(), HttpStatus.NOT_FOUND.value(), "COMMENT_DELETED");
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+    @ExceptionHandler(ValidationException.class)
+    public ResponseEntity<ErrorResponse> handleValidationException(ValidationException e) {
+        log.error("validation error", e);
+        ErrorResponse response = new ErrorResponse(e.getErrorCode());
+        return new ResponseEntity<>(response, HttpStatus.valueOf(e.getErrorCode().getStatus()));
     }
 
     @ExceptionHandler(MissingRequestHeaderException.class)
     public ResponseEntity<ErrorResponse> handleMissingTokenException(MissingRequestHeaderException e) {
-        ErrorResponse errorResponse = new ErrorResponse(e.getMessage(), HttpStatus.BAD_REQUEST.value(), "MISSING_REQUEST_HEADER");
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        log.error("missing request header", e);
+        ErrorResponse response = new ErrorResponse(e.getErrorCode());
+        return new ResponseEntity<>(response, HttpStatus.valueOf(e.getErrorCode().getStatus()));
     }
 
-    @ExceptionHandler(PurchaseNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handlePurchaseNotFoundException(PurchaseNotFoundException e) {
-        ErrorResponse errorResponse = new ErrorResponse(e.getMessage(), HttpStatus.NOT_FOUND.value(), "PURCHASE_NOT_FOUND");
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+    @ExceptionHandler(DuplicateCategoryNameException.class)
+    public ResponseEntity<ErrorResponse> handleDuplicateCategoryName(DuplicateCategoryNameException e) {
+        log.error("duplicate category name", e);
+        ErrorResponse response = new ErrorResponse(e.getErrorCode());
+        return new ResponseEntity<>(response, HttpStatus.valueOf(e.getErrorCode().getStatus()));
     }
 
-    @ExceptionHandler(LikeNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleLikeNotFoundException(LikeNotFoundException e) {
-        ErrorResponse errorResponse = new ErrorResponse(e.getMessage(), HttpStatus.NOT_FOUND.value(), "LIKE_NOT_FOUND");
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+    @ExceptionHandler(DeletedCommentException.class)
+    public ResponseEntity<ErrorResponse> handleDeletedCommentException(DeletedCommentException e) {
+        log.error("deleted comment not found", e);
+        ErrorResponse response = new ErrorResponse(e.getErrorCode());
+        return new ResponseEntity<>(response, HttpStatus.valueOf(e.getErrorCode().getStatus()));
     }
 
     @ExceptionHandler(UnauthorizedException.class)
     public ResponseEntity<ErrorResponse> handleUnauthorizedException(UnauthorizedException e) {
-        ErrorResponse errorResponse = new ErrorResponse(e.getMessage(), HttpStatus.UNAUTHORIZED.value(), "UNAUTHORIZED");
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
+        log.error("unauthorized", e);
+        ErrorResponse response = new ErrorResponse(e.getErrorCode());
+        return new ResponseEntity<>(response, HttpStatus.valueOf(e.getErrorCode().getStatus()));
+    }
+
+    @ExceptionHandler(CommentNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleCommentNotFoundException(CommentNotFoundException e) {
+        log.error("comment not found", e);
+        ErrorResponse response = new ErrorResponse(e.getErrorCode());
+        return new ResponseEntity<>(response, HttpStatus.valueOf(e.getErrorCode().getStatus()));
+    }
+
+    @ExceptionHandler(PurchaseNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handlePurchaseNotFoundException(PurchaseNotFoundException e) {
+        log.error("purchase not found", e);
+        ErrorResponse response = new ErrorResponse(e.getErrorCode());
+        return new ResponseEntity<>(response, HttpStatus.valueOf(e.getErrorCode().getStatus()));
+    }
+
+    @ExceptionHandler(LikeNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleLikeNotFoundException(LikeNotFoundException e) {
+        log.error("like not found", e);
+        ErrorResponse response = new ErrorResponse(e.getErrorCode());
+        return new ResponseEntity<>(response, HttpStatus.valueOf(e.getErrorCode().getStatus()));
     }
 
     @ExceptionHandler(UserNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleUserNotFoundException(UserNotFoundException e) {
-        ErrorResponse errorResponse = new ErrorResponse(e.getMessage(), HttpStatus.NOT_FOUND.value(), "USER_NOT_FOUND");
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+        log.error("user not found", e);
+        ErrorResponse response = new ErrorResponse(e.getErrorCode());
+        return new ResponseEntity<>(response, HttpStatus.valueOf(e.getErrorCode().getStatus()));
     }
 
-    @ExceptionHandler(ValidationException.class)
-    public ResponseEntity<ErrorResponse> handleValidationException(ValidationException e) {
-        ErrorResponse errorResponse = new ErrorResponse(e.getMessage(), HttpStatus.BAD_REQUEST.value(), "VALIDATION_ERROR");
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    @ExceptionHandler(data.exception.DataAccessException.class)
+    public ResponseEntity<ErrorResponse> handleDataAccessException(DataAccessException e) {
+        log.error("data access error", e);
+        ErrorResponse response = new ErrorResponse(e.getErrorCode());
+        return new ResponseEntity<>(response, HttpStatus.valueOf(e.getErrorCode().getStatus()));
     }
 
     @ExceptionHandler(NullPointerException.class)
     public ResponseEntity<ErrorResponse> handleNullPointerException(NullPointerException e) {
-        ErrorResponse errorResponse = new ErrorResponse(e.getMessage(), HttpStatus.NOT_FOUND.value(), "NULL_POINTER_ERROR");
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+        log.error("null pointer error", e);
+        ErrorResponse response = new ErrorResponse(e.getErrorCode());
+        return new ResponseEntity<>(response, HttpStatus.valueOf(e.getErrorCode().getStatus()));
     }
 
-    @ExceptionHandler(DataAccessException.class)
-    public ResponseEntity<ErrorResponse> handleDataAccessException(DataAccessException e) {
-        ErrorResponse errorResponse = new ErrorResponse(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value(), "DATABASE_ERROR");
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
-    }
-
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleGenericException(Exception e) {
-        ErrorResponse errorResponse = new ErrorResponse(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value(), "INTERNAL_SERVER_ERROR");
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+    @ExceptionHandler(GenericException.class)
+    public ResponseEntity<ErrorResponse> handleGenericException(GenericException e) {
+        log.error("internal server error", e);
+        ErrorResponse response = new ErrorResponse(e.getErrorCode());
+        return new ResponseEntity<>(response, HttpStatus.valueOf(e.getErrorCode().getStatus()));
     }
 }
 

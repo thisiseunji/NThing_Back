@@ -20,12 +20,12 @@ public class FileService {
         this.fileMapper = fileMapper;
     }
 
-    public void saveFiles(int purchase_id, List<FileDto.Request> files) {
+    public void saveFiles(int purchaseId, List<FileDto.Request> files) {
         if(CollectionUtils.isEmpty(files)) {
             return;
         }
         for(FileDto.Request file : files) {
-            file.setPurchase_id(purchase_id);
+            file.setPurchase_id(purchaseId);
         }
         fileMapper.saveAll(files);
     }

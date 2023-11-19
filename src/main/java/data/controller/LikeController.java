@@ -1,10 +1,8 @@
 package data.controller;
 
-import data.dto.ErrorResponse;
+import data.constants.ErrorCode;
 import data.dto.LikeDto;
 import data.dto.PurchaseDto;
-import data.exception.LikeNotFoundException;
-import data.exception.PurchaseNotFoundException;
 import data.exception.MissingRequestHeaderException;
 import data.service.LikeService;
 import data.service.PurchaseService;
@@ -39,36 +37,31 @@ public class LikeController {
             @PathVariable int purchaseId,
             @RequestBody LikeDto.Request request
     ) {
-        try {
-            validateToken(token);
-            int userId = jwtProvider.parseJwt(token);
-            Optional<Integer> likeIdOptional = likeService.findLikeIdByUserIdAndPurchaseId(userId, purchaseId);
+        validateToken(token);
+        int userId = jwtProvider.parseJwt(token);
+        Optional<Integer> likeIdOptional = likeService.findLikeIdByUserIdAndPurchaseId(userId, purchaseId);
 
-            if (request.isValue()) {
-                if (likeIdOptional.isPresent()) {
-                    return ResponseEntity.ok().build();
-                } else {
-                    LikeDto likeDto = buildLikeDtoFromTokenAndPurchaseId(token, purchaseId);
-                    likeService.createLike(likeDto);
-                    return ResponseEntity.status(HttpStatus.CREATED).build();
-                }
+        if (request.isValue()) {
+            if (likeIdOptional.isPresent()) {
+                return ResponseEntity.ok().build();
             } else {
-                if (likeIdOptional.isPresent()){
-                    likeService.deleteLike(likeIdOptional.get());
-                    return ResponseEntity.noContent().build();
-                } else {
-                    return ResponseEntity.notFound().build();
-                }
+                LikeDto likeDto = buildLikeDtoFromTokenAndPurchaseId(token, purchaseId);
+                likeService.createLike(likeDto);
+                return ResponseEntity.status(HttpStatus.CREATED).build();
             }
-
-        } catch (Exception e) {
-            return handleException(e);
+        } else {
+            if (likeIdOptional.isPresent()){
+                likeService.deleteLike(likeIdOptional.get());
+                return ResponseEntity.noContent().build();
+            } else {
+                return ResponseEntity.notFound().build();
+            }
         }
     }
 
     private void validateToken(String token) throws MissingRequestHeaderException {
         if (token == null || token.isEmpty()) {
-            throw new MissingRequestHeaderException("Required request header 'Authorization' is missing");
+            throw new MissingRequestHeaderException("Required request header 'Authorization' is missing", ErrorCode.MISSING_REQUEST_HEADER);
         }
     }
 
@@ -80,26 +73,5 @@ public class LikeController {
         likeDto.setUserId(userId);
         likeDto.setPurchaseId(purchaseIdFromDb);
         return likeDto;
-    }
-
-    private ResponseEntity<?> handleException(Exception e) {
-        HttpStatus status;
-        String errorCode;
-        if (e instanceof MissingRequestHeaderException) {
-            status = HttpStatus.BAD_REQUEST;
-            errorCode = "MISSING_REQUEST_HEADER";
-        } else if (e instanceof PurchaseNotFoundException) {
-            status = HttpStatus.NOT_FOUND;
-            errorCode = "PURCHASE_NOT_FOUND";
-        } else if (e instanceof LikeNotFoundException) {
-            status = HttpStatus.NOT_FOUND;
-            errorCode = "LIKE_NOT_FOUND";
-        } else {
-            status = HttpStatus.INTERNAL_SERVER_ERROR;
-            errorCode = "INTERNAL_SERVER_ERROR";
-        }
-
-        ErrorResponse errorResponse = new ErrorResponse(e.getMessage(), status.value(), errorCode);
-        return ResponseEntity.status(status).body(errorResponse);
     }
 }

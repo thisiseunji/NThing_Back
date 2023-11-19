@@ -1,5 +1,6 @@
 package data.controller;
 
+import data.constants.ErrorCode;
 import data.dto.MessageTokenDto;
 import data.dto.PurchaseDto;
 import data.dto.UserDto;
@@ -36,7 +37,7 @@ public class UserController {
     public ResponseEntity<UserDto> findById(@RequestHeader("Authorization") String token) {
         UserDto user = userService.findById(token);
         if (user == null) {
-            throw new UserNotFoundException("User not found for the provided token.");
+            throw new UserNotFoundException("User not found for the provided token.", ErrorCode.USER_NOT_FOUND);
         }
         return ResponseEntity.ok(user);
     }

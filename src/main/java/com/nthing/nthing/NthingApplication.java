@@ -6,8 +6,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
-@ComponentScan({"data.*"})
-@MapperScan({"data.*"})
+@ComponentScan({"data"})
+@MapperScan({"data"})
 public class NthingApplication {
 
 	public static void main(String[] args) {

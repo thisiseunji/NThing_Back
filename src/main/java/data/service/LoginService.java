@@ -29,19 +29,13 @@ public class LoginService {
 
 
     public MessageTokenDto googleLogin(IdToken token) throws FirebaseAuthException {
-        try {
-            String idToken = token.getIdToken();
-            FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(idToken);
+        String idToken = token.getIdToken();
+        FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(idToken);
 
-            if (duplicatedEmail(decodedToken.getEmail())) {
-                System.out.println("로그인");
-                return handleLoginSuccess(decodedToken);
-            } else {
-                System.out.println("회원가입");
-                return handleSignupSuccess(decodedToken);
-            }
-        } catch (FirebaseAuthException e) {
-            return new MessageTokenDto("구글 로그인 성공", null, null);
+        if (duplicatedEmail(decodedToken.getEmail())) {
+            return handleLoginSuccess(decodedToken);
+        } else {
+            return handleSignupSuccess(decodedToken);
         }
     }
 

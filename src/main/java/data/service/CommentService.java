@@ -1,5 +1,6 @@
 package data.service;
 
+import data.constants.ErrorCode;
 import data.dto.CommentDto;
 import data.exception.CommentNotFoundException;
 import data.exception.DeletedCommentException;
@@ -62,20 +63,20 @@ public class CommentService {
     private CommentDto.Comment findExistingComment(int commentId) {
         CommentDto.Comment existingComment = commentMapper.findCommentById(commentId);
         if (existingComment == null) {
-            throw new CommentNotFoundException("Comment not found");
+            throw new CommentNotFoundException("Comment not found", ErrorCode.COMMENT_NOT_FOUND);
         }
         return existingComment;
     }
 
     private void validateUserPermission(int loginId, int userId) {
         if (loginId != userId) {
-            throw new UnauthorizedException("Edit permission denied");
+            throw new UnauthorizedException("Edit permission denied", ErrorCode.UNAUTHORIZED);
         }
     }
 
     private void validateIsDeleted(boolean isDeleted) {
         if (isDeleted) {
-            throw new DeletedCommentException("Cannot modify a deleted comment");
+            throw new DeletedCommentException("Cannot modify a deleted comment", ErrorCode.COMMENT_DELETED);
         }
     }
 
