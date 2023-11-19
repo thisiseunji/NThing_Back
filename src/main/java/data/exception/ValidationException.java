@@ -1,7 +1,13 @@
 package data.exception;
 
+import data.constants.ErrorCode;
+import lombok.Getter;
+
+@Getter
 public class ValidationException extends RuntimeException {
-    public ValidationException(String message) {
+    private final ErrorCode errorCode;
+    public ValidationException(String message, ErrorCode errorCode) {
         super(message);
+        this.errorCode = errorCode;
     }
 }

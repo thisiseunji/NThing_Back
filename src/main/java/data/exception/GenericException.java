@@ -4,9 +4,9 @@ import data.constants.ErrorCode;
 import lombok.Getter;
 
 @Getter
-public class MissingRequestHeaderException extends RuntimeException {
+public class GenericException extends Exception {
     private final ErrorCode errorCode;
-    public MissingRequestHeaderException(String message, ErrorCode errorCode) {
+    public GenericException(String message, ErrorCode errorCode) {
         super(message);
         this.errorCode = errorCode;
     }
