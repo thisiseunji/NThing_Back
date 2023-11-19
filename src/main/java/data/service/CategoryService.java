@@ -1,5 +1,6 @@
 package data.service;
 
+import data.constants.ErrorCode;
 import data.dto.CategoryDto;
 import data.dto.FileDto;
 import data.exception.DuplicateCategoryNameException;
@@ -25,23 +26,17 @@ public class CategoryService {
     private final HttpServletRequest request;
 
     public void createCategory(String name, MultipartFile file) {
-        try {
-            if (categoryMapper.existsByName(name)) {
-                throw new DuplicateCategoryNameException("Category with name "+name+" already exists.");
-            }
-            String saveRoute = "category";
-            FileDto.Request fileDto = multiFileUtils.uploadFile(file, saveRoute);
-            CategoryDto categoryDto = CategoryDto.builder()
-                    .name(name)
-                    .image(fileDto.getSave_name())
-                    .build();
-
-            categoryMapper.createCategory(categoryDto);
-        } catch (DuplicateCategoryNameException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new RuntimeException("Error while creating category", e);
+        if (categoryMapper.existsByName(name)) {
+            throw new DuplicateCategoryNameException("Category with name "+name+" already exists.", ErrorCode.DUPLICATE_CATEGORY_NAME);
         }
+        String saveRoute = "category";
+        FileDto.Request fileDto = multiFileUtils.uploadFile(file, saveRoute);
+        CategoryDto categoryDto = CategoryDto.builder()
+                .name(name)
+                .image(fileDto.getSave_name())
+                .build();
+
+        categoryMapper.createCategory(categoryDto);
     }
 
     public List<CategoryDto> findAllCategory() {

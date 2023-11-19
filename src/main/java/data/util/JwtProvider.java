@@ -1,5 +1,7 @@
 package data.util;
 
+import data.constants.ErrorCode;
+import data.exception.UnauthorizedException;
 import io.jsonwebtoken.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -65,12 +67,15 @@ public class JwtProvider {
 
     // 토큰 유효성 확인(리프레시 토큰도 마찬가지)
     public boolean isValidToken(String token) {
-
-        Claims claims = Jwts.parser()
-                            .setSigningKey(secret)
-                            .parseClaimsJws(BearerRemove(token))
-                            .getBody();
-        return claims.getExpiration().after(new Date());
+        try {
+            Claims claims = Jwts.parser()
+                    .setSigningKey(secret)
+                    .parseClaimsJws(BearerRemove(token))
+                    .getBody();
+            return claims.getExpiration().after(new Date());
+        } catch (ExpiredJwtException e) {
+            throw new UnauthorizedException("유효하지 않은 토큰", ErrorCode.UNAUTHORIZED);
+        }
     }
 
     private String BearerRemove(String token) {

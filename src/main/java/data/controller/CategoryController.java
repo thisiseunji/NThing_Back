@@ -21,15 +21,8 @@ public class CategoryController {
 
     @PostMapping("/category")
     public ResponseEntity<?> createCategory(String name, MultipartFile file) {
-        try {
-            categoryService.createCategory(name, file);
-            return ResponseEntity.status(HttpStatus.CREATED).build();
-        } catch (DuplicateCategoryNameException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Category name already exists.");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal Server Error");
-        }
-
+        categoryService.createCategory(name, file);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @GetMapping("/categories")

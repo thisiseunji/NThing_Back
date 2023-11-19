@@ -1,5 +1,6 @@
 package data.filter;
 
+import data.constants.ErrorCode;
 import data.exception.UnauthorizedException;
 import data.util.JwtProvider;
 import org.springframework.util.PatternMatchUtils;
@@ -48,10 +49,10 @@ public class LoginFilter implements Filter{
         if(isLoginCheckPath(requestURI)) { // 검증해야하는 URI인 경우
             if (accessToken != null) { // 엑세스 토큰이 null이 아니면
                 if (!jwtProvider.isValidToken(accessToken)) { // 유효하지 않은 토큰의 경우
-                    throw new UnauthorizedException("유효하지 않은 토큰");
+                    throw new UnauthorizedException("유효하지 않은 토큰", ErrorCode.UNAUTHORIZED);
                 }
             } else { // 엑세스 토큰이 없는 경우
-                throw new UnauthorizedException("토큰 정보 없음");
+                throw new UnauthorizedException("토큰 정보 없음", ErrorCode.UNAUTHORIZED);
             }
         }
         chain.doFilter(request, response);
