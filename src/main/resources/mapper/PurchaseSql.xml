@@ -3,84 +3,48 @@
 <mapper namespace="data.mapper.PurchaseMapper">
     <insert id="createPurchase" parameterType="data.dto.PurchaseDto$Request" useGeneratedKeys="true" keyProperty="id">
         insert into nthing.purchase
-        (
-            title
-            ,description
-            ,latitude
-            ,longitude
-            ,date
-            ,denominator
-            ,numerator
-            ,price
-            ,place
-            ,manager_id
-            ,category_id
-            ,status
-            ,updated_at
-        )
+            (title, description, latitude, longitude, date, denominator, numerator, price, place, manager_id, category_id, status)
         values
-        (
-            #{title}
-            ,#{description}
-            ,#{latitude}
-            ,#{longitude}
-            ,#{date}
-            ,#{denominator}
-            ,#{numerator}
-            ,#{price}
-            ,#{place}
-            ,#{manager_id}
-            ,#{category_id}
-            ,0
-            ,now()
-        )
+            (#{title}, #{description}, #{latitude}, #{longitude}, #{date}, #{denominator}, #{numerator}, #{price}, #{place}, #{manager_id}, #{category_id}, 0)
     </insert>
+    <!-- 첫 번째 쿼리: 위치 설정 -->
+    <select id="setLocation" parameterType="map">
+        SET @location = POINT(#{longitude}, #{latitude})
+    </select>
+    <!-- 두 번째 쿼리: 데이터 조회 -->
     <select id="findAllPurchase" resultType="data.dto.PurchaseDto$Summary" parameterType="map">
-        select
-            a.id
-            ,a.title
-            ,a.latitude
-            ,a.longitude
-            ,a.date
-            ,a.denominator
-            ,a.numerator
-            ,a.price
-            ,a.place
-            ,a.status
-            ,(
-                select
-                    count(*)
-                from
-                    nthing.like b
-                where true
-                    and b.user_id = #{user_id}
-                    and b.purchase_id = a.id
-            ) as is_liked
-            ,(
-                select
-                    save_name
-                from
-                    nthing.purchase_file
-                where
-                    true
-                    and purchase_id = a.id
-                    and delete_yn = false
-                order by
-                    id
-                limit 1
-            ) as image
-        from
-            nthing.purchase as a
-        where
-            a.delete_yn = 0
-        <where>
+        select p.id, p.title, p.latitude, p.longitude, p.date, p.denominator, p.numerator, p.price, p.place, p.status
+             , (
+             select count(*)
+             from nthing.like l
+             where true
+               and l.user_id = #{user_id}
+               and l.purchase_id = p.id
+             ) as is_liked
+             , (
+             select save_name
+             from nthing.purchase_file
+             where true
+               and purchase_id = p.id
+               and delete_yn = false
+             order by id
+             limit 1
+             ) as image,
+            ST_Distance_Sphere(@location, POINT(p.longitude, p.latitude)) as distance
+        from nthing.purchase as p
+        where true
+          and p.delete_yn = 0
+          and <![CDATA[ST_Distance_Sphere(@location, POINT(p.longitude, p.latitude)) <= #{radius}]]>
             <if test="search_keyword != null and search_keyword != ''">
-                a.title like CONCAT('%',#{search_keyword},'%')
+                and p.title like CONCAT('%',#{search_keyword},'%')
+                or p.description like CONCAT('%',#{search_keyword},'%')
             </if>
-        </where>
-        <if test="sort != null and sort != ''">
-            order by ${sort}
-        </if>
+            <if test="status == true">
+                and p.status = false
+            </if>
+            <if test="sort != null and sort != ''">
+                order by ${sort}
+            </if>
     </select>
     <select id="findPurchaseById" resultType="data.dto.PurchaseDto$Detail" parameterType="int">
         select
@@ -116,31 +80,24 @@
             a.id = #{id}
             and a.delete_yn = 0
     </select>
+    <select id="findPurchaseByIdAndUserId" resultType="boolean" parameterType="map">
+        select count(*) > 0 isExist
+        from nthing.purchase
+        where id = #{id}
+          and manager_id = #{user_id}
+          and delete_yn = 0
+    </select>
     <update id="updatePurchase" parameterType="data.dto.PurchaseDto$Request">
         update purchase
-        set
-            title = #{title}
-            ,description = #{description}
-            ,latitude = #{latitude}
-            ,longitude = #{longitude}
-            ,date = #{date}
-            ,denominator = #{denominator}
-            ,numerator = #{numerator}
-            ,status = #{status}
-            ,price = #{price}
-            ,place = #{place}
-            ,updated_at = now()
-            ,category_id = #{category_id}
+        set title = #{title}, description = #{description}, latitude = #{latitude}, longitude = #{longitude},
+            date = #{date}, denominator = #{denominator}, numerator = #{numerator}, status = #{status}, price = #{price},
+            place = #{place}, updated_at = now(), category_id = #{category_id}
         where
             id = #{id}
-            and manager_id = #{manager_id}
-            and delete_yn = 0
     </update>
     <delete id="deletePurchase" parameterType="int">
-        UPDATE purchase SET
-            delete_yn = 1
-            ,deleted_at = NOW()
-        WHERE
-            id = #{id}
+        UPDATE nthing.purchase
+        SET delete_yn = 1, deleted_at = NOW()
+        WHERE id = #{id}
     </delete>
 </mapper>

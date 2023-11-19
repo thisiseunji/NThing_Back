@@ -6,6 +6,9 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,21 +43,46 @@ public class PurchaseDto {
     @NoArgsConstructor
     public static class Request {
         private int id;
+
+        @NotBlank(message="제목은 필수 입니다.")
         private String title;
+
+        @NotBlank(message="설명은 필수 입니다.")
         private String description;
+
+        @NotNull(message="위도는 필수 입니다.")
         private Double latitude;
+
+        @NotNull(message="경도는 필수 입니다.")
         private Double longitude;
-        @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
+
+        @NotBlank(message="거래 시간은 필수 입니다.")
+        @JsonFormat(pattern = "yyyy-MM-dd HH:mm", timezone = "Asia/Seoul")
         private Timestamp date;
+
+        @NotNull(message="총 할당은 필수 입니다.")
+        @Min(value = 0, message = "Denominator must be greater than or equal to 0")
         private int denominator;
+
+        @NotNull(message="할당은 필수 입니다.")
         private int numerator;
+
         private boolean status;
+
+        @NotNull(message="가격은 필수 입니다.")
         private int price;
+
+        @NotBlank(message="거래 장소는 필수 입니다.")
         private String place;
+
         private List<MultipartFile> files = new ArrayList<>();
+
         @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
         private Timestamp updatedAt;
+
         private int manager_id;
+
+        @NotNull(message="카테고리는 필수 입니다.")
         private int category_id;
 
         // 삭제할 첨부파일 id List
