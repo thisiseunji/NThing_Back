@@ -1,22 +1,23 @@
 package data.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import data.constants.ErrorCode;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ErrorResponse {
     private final String timestamp = LocalDateTime.now().toString();
-    private String message;
     private int status;
+    private String message;
     private String code;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private List<String> errors = null;
 
     public ErrorResponse(ErrorCode errorCode) {
         this.status = errorCode.getStatus();
