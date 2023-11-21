@@ -6,36 +6,12 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.*;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
 public class PurchaseDto {
-
-    @Getter
-    @Builder
-    @AllArgsConstructor
-    public static class Purchase {
-        private int id;
-        private String title;
-        private String description;
-        private Double latitude;
-        private Double longitude;
-        private Timestamp date;
-        private int denominator;
-        private int numerator;
-        private boolean status;
-        private int price;
-        private String place;
-        private Timestamp updatedAt;
-        private boolean deleteYn;
-        private Timestamp deletedAt;
-        private int managerId;
-        private int categoryId;
-    }
 
     @Getter
     @Setter
@@ -56,18 +32,17 @@ public class PurchaseDto {
         @NotNull(message="경도는 필수 입니다.")
         private Double longitude;
 
-        @NotBlank(message="거래 시간은 필수 입니다.")
-        @JsonFormat(pattern = "yyyy-MM-dd HH:mm", timezone = "Asia/Seoul")
-        private Timestamp date;
+        @NotNull(message = "거래 예정일은 필수 입니다.")
+        @Pattern(regexp = "^(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2})$", message = "올바른 날짜 형식이 아닙니다. (yyyy-MM-dd HH:mm:ss)")
+        private String date;
 
-        @NotNull(message="총 할당은 필수 입니다.")
-        @Min(value = 0, message = "Denominator must be greater than or equal to 0")
+        @NotNull(message="총 인원은 필수 입니다.")
+        @Min(value = 2, message = "총 인원은 2명 이상이어야 합니다.")
         private int denominator;
 
-        @NotNull(message="할당은 필수 입니다.")
-        private int numerator;
+        private int numerator = 1;
 
-        private boolean status;
+        private boolean status = false;
 
         @NotNull(message="가격은 필수 입니다.")
         private int price;
@@ -77,21 +52,18 @@ public class PurchaseDto {
 
         private List<MultipartFile> files = new ArrayList<>();
 
-        @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
-        private Timestamp updatedAt;
-
         private int manager_id;
 
-        @NotNull(message="카테고리는 필수 입니다.")
-        private int category_id;
+        @NotNull(message="카테고리를 필수입니다.")
+        private Integer category_id;
 
         // 삭제할 첨부파일 id List
         private List<Integer> removeFileIds = new ArrayList<>();
     }
 
     @Getter
-    @Builder
     @Setter
+    @Builder
     @AllArgsConstructor
     @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
     public static class Summary {
@@ -130,12 +102,22 @@ public class PurchaseDto {
         private int price;
         private String place;
         @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
+        private Timestamp createdAt;
+        @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
         private Timestamp updatedAt;
         private String manager;
         private int categoryId;
         private String categoryName;
         private boolean isLiked;
 
-        private List<String> images;
+        private List<ImageDto> images;
+
+        @Getter
+        @Setter
+        @Builder
+        public static class ImageDto {
+            private int id;
+            private String url;
+        }
     }
 }

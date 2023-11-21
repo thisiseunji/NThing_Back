@@ -1,12 +1,15 @@
 package data.controller;
 
+import data.constants.ErrorCode;
 import data.dto.FileDto;
+import data.exception.ValidationException;
 import data.service.FileService;
 import data.service.PurchaseService;
 import data.dto.PurchaseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -24,8 +27,12 @@ public class PurchaseController {
     @PostMapping("/purchase")
     public ResponseEntity<?> createPurchase(
             @RequestHeader("Authorization") String token,
-            @Valid PurchaseDto.Request purchaseRequest
+            @Valid PurchaseDto.Request purchaseRequest,
+            BindingResult bindingResult
     ) {
+        if (bindingResult.hasErrors()) {
+            throw new ValidationException(bindingResult, ErrorCode.VALIDATION_ERROR);
+        }
         purchaseService.createPurchase(purchaseRequest, token);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
