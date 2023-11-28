@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="data.mapper.ChatMapper">
+    <select id="findAllRoom" resultType="data.dto.ChatRoomDto">
+        select id, purchase_id, created_at, is_deleted, is_completed
+        from nthing.chat_room;
+    </select>
+
+    <select id="findRoomById" parameterType="int" resultType="data.dto.ChatRoomDto">
+        select id, purchase_id, created_at, is_deleted, is_completed
+        from nthing.chat_room
+        where id = #{int}
+    </select>
+
+    <insert id="createChatRoom" parameterType="data.dto.ChatRoomDto" useGeneratedKeys="true" keyProperty="id">
+        insert into nthing.chat_room (purchase_id, created_at, is_deleted, is_completed)
+        values #{purchaseId}, now(), default, default
+    </insert>
+
+    <select id="_findChatRoomByPurchaseId" parameterType="int" resultType="data.dto.ChatRoomDto">
+        select id, purchase_id, created_at, is_deleted, is_completed
+        from nthing.chat_room
+        where purchase_id = #{purchaseId}
+    </select>
+
+    <insert id="createChatMessage" parameterType="data.dto.ChatMessageDto">
+        insert into nthing.chat_message (sender, message, sent_at, chat_room_id)
+        values (#{sender}, #{message}, now(), #{chatRoomId})
+    </insert>
+
+    <insert id="createOrUpdateChatRoomUser" parameterType="data.dto.ChatRoomDto">
+        insert into nthing.chat_room_user (user_id, chat_room_id, joined_at, left_at)
+        values (#{userId}, #{id}, now(), default)
+            on duplicate key update
+            joined_at = now();
+    </insert>
+
+    <update id="deleteChatRoomUser" parameterType="data.dto.ChatRoomDto">
+        update nthing.chat_room_user
+        set left_at = now()
+        where user_id = #{userId} and chat_room_id = #{chatRoomId};
+    </update>
+
+
+</mapper>

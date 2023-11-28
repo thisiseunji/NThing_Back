@@ -30,6 +30,10 @@ public class LoginFilter implements Filter{
             "/college/*",
             "/file/*",
             "/category"
+            /* 채팅 서비스 테스트용 */
+            , "/ws/chat"
+            , "/chat"
+            , "/chat/*"
     }; // 추가 필요
 
     @Override
