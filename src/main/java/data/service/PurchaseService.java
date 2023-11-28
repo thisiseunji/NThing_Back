@@ -1,8 +1,11 @@
 package data.service;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import data.constants.ErrorCode;
 import data.dto.FileDto;
 import data.dto.PurchaseDto;
+import data.exception.InvalidRequestException;
 import data.exception.PurchaseNotFoundException;
 import data.mapper.FileMapper;
 import data.mapper.PurchaseMapper;
@@ -26,6 +29,8 @@ public class PurchaseService {
     private final HttpServletRequest request;
 
     public void createPurchase(PurchaseDto.Request purchaseRequest, String token) {
+        if (isValidDate(purchaseRequest.getDate()))
+            throw new InvalidRequestException("Invalid date: " + purchaseRequest.getDate(), ErrorCode.INVALID_INPUT_VALUE);
         int userId = jwtProvider.parseJwt(token);
         purchaseRequest.setManager_id(userId);
         purchaseMapper.createPurchase(purchaseRequest);
@@ -41,7 +46,11 @@ public class PurchaseService {
             List<PurchaseDto.Summary> result = purchaseMapper.findAllPurchase(map);
             List<PurchaseDto.Summary> generatePurchaseDtoList = new ArrayList<>();
             for (PurchaseDto.Summary purchaseDto : result) {
-                purchaseDto.setImage(multiFileUtils.getDomain() + purchaseDto.getImage());
+                String image = purchaseDto.getImage();
+                purchaseDto.setImage(image != null
+                                ? multiFileUtils.getDomain() + image
+                                : null
+                );
                 generatePurchaseDtoList.add(purchaseDto);
             }
             return generatePurchaseDtoList;
@@ -54,12 +63,16 @@ public class PurchaseService {
             throw new PurchaseNotFoundException("Purchase not found for ID: " + id, ErrorCode.PURCHASE_NOT_FOUND);
 
         List<FileDto.Response> fileList = fileMapper.findAllByPurchaseId(id);
-        List<String> imageList = new ArrayList<>();
+        List<PurchaseDto.Detail.ImageDto> imageList = new ArrayList<>();
 
         if (!fileList.isEmpty()) {
             List<FileDto.Response> generatedFiles = multiFileUtils.generateFilePath(fileList);
             for (FileDto.Response file : generatedFiles) {
-                imageList.add(file.getSaveName());
+                PurchaseDto.Detail.ImageDto imageDto = PurchaseDto.Detail.ImageDto.builder()
+                        .id(file.getId())
+                        .url(file.getSaveName())
+                        .build();
+                imageList.add(imageDto);
             }
         }
         detail.setImages(imageList);
@@ -76,8 +89,6 @@ public class PurchaseService {
         } else {
             throw new PurchaseNotFoundException("Purchase not found for id: " + id, ErrorCode.PURCHASE_NOT_FOUND);
         }
-
-
     }
 
     public void deletePurchase(int id, String token) {
@@ -91,5 +102,12 @@ public class PurchaseService {
         } else {
             throw new PurchaseNotFoundException("Purchase not found for id: " + id, ErrorCode.PURCHASE_NOT_FOUND);
         }
+    }
+
+    private boolean isValidDate(String dateString) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        LocalDateTime date = LocalDateTime.parse(dateString, formatter);
+        LocalDateTime currentTime = LocalDateTime.now();
+        return date.isBefore(currentTime);
     }
 }

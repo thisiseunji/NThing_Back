@@ -74,7 +74,11 @@ public class MultiFileUtils {
         List<FileDto.Response> generatedFileList = new ArrayList<>();
 
         for (FileDto.Response file : fileList) {
-            file.setSaveName(getDomain() + file.getSaveName());
+            String filePath = file.getSaveName();
+            file.setSaveName(filePath != null
+                    ? getDomain() + file.getSaveName()
+                    : null
+            );
             generatedFileList.add(file);
         }
         return generatedFileList;

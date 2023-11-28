@@ -6,17 +6,11 @@ import data.exception.NullPointerException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -25,8 +19,21 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ValidationException.class)
     public ResponseEntity<ErrorResponse> handleValidationException(ValidationException e) {
-        log.error("validation error", e);
+        List<String> errorMessages = e.getBindingResult().getFieldErrors()
+                .stream()
+                .map(fieldError -> fieldError.getField() + ": " + fieldError.getDefaultMessage())
+                .collect(Collectors.toList());
+
+        List<String> errorMessagesLog = e.getBindingResult().getFieldErrors()
+                .stream()
+                .map(FieldError::getField)
+                .collect(Collectors.toList());
+
+        log.error("validation error: " + String.join(", ", errorMessagesLog), e);
+
         ErrorResponse response = new ErrorResponse(e.getErrorCode());
+        response.setErrors(errorMessages);
+
         return new ResponseEntity<>(response, HttpStatus.valueOf(e.getErrorCode().getStatus()));
     }
 
@@ -47,6 +54,13 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(DeletedCommentException.class)
     public ResponseEntity<ErrorResponse> handleDeletedCommentException(DeletedCommentException e) {
         log.error("deleted comment not found", e);
+        ErrorResponse response = new ErrorResponse(e.getErrorCode());
+        return new ResponseEntity<>(response, HttpStatus.valueOf(e.getErrorCode().getStatus()));
+    }
+
+    @ExceptionHandler(InvalidRequestException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidRequestException(InvalidRequestException e) {
+        log.error("invalid request", e);
         ErrorResponse response = new ErrorResponse(e.getErrorCode());
         return new ResponseEntity<>(response, HttpStatus.valueOf(e.getErrorCode().getStatus()));
     }
