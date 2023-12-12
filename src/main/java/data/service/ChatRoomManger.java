@@ -9,11 +9,6 @@ import java.util.*;
 public class ChatRoomManger {
     Map<Integer, ChatRoomDto> chatRooms = new HashMap<>();
 
-    // test용
-    public ChatRoomManger() {
-        chatRooms.put(1, new ChatRoomDto(1, 1));
-    }
-
     public void addChatRoom(ChatRoomDto chatRoom) {
         chatRooms.put(chatRoom.getId(), chatRoom);
     }

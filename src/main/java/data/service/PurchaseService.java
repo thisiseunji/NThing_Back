@@ -3,6 +3,7 @@ package data.service;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import data.constants.ErrorCode;
+import data.dto.ChatRoomDto;
 import data.dto.FileDto;
 import data.dto.PurchaseDto;
 import data.exception.InvalidRequestException;
@@ -27,6 +28,8 @@ public class PurchaseService {
     private final MultiFileUtils multiFileUtils;
     private final JwtProvider jwtProvider;
     private final HttpServletRequest request;
+    private final ChatService chatService;
+
 
     public void createPurchase(PurchaseDto.Request purchaseRequest, String token) {
         if (isValidDate(purchaseRequest.getDate()))
@@ -37,6 +40,9 @@ public class PurchaseService {
         int purchaseId = purchaseRequest.getId();
         List<FileDto.Request> files = multiFileUtils.uploadFiles(purchaseRequest.getFiles(), "purchase");
         fileService.saveFiles(purchaseId, files);
+
+        // 채팅방 생성
+        chatService.createChatRoom(ChatRoomDto.builder().purchaseId(purchaseId).build());
     }
 
     public List<PurchaseDto.Summary> findAllPurchase(Map<String, Object> map) {

@@ -24,12 +24,6 @@ public class ChatRoomDto {
     private int userId;
 
     @Builder
-    public ChatRoomDto(int id, int purchaseId) {
-        this.id= id;
-        this.purchaseId = purchaseId;
-    }
-
-    @Builder
     public ChatRoomDto(int id, int purchaseId, Timestamp createdAt, Boolean isDeleted, Boolean isCompleted) {
         this.id = id;
         this.purchaseId = purchaseId;
