@@ -27,7 +27,6 @@ public class ChatService {
         return chatRoomManager.getChatRoom(id);
     }
 
-    // purchase가 생기면, 채팅 방 생성되도록 구현
     public void createChatRoom(ChatRoomDto chatRoomDto) {
         chatMapper.createChatRoom(chatRoomDto);
         // 싱글톤으로 관리

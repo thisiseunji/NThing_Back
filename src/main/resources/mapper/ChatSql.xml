@@ -9,12 +9,12 @@
     <select id="findRoomById" parameterType="int" resultType="data.dto.ChatRoomDto">
         select id, purchase_id, created_at, is_deleted, is_completed
         from nthing.chat_room
-        where id = #{int}
+        where id = #{id}
     </select>
 
     <insert id="createChatRoom" parameterType="data.dto.ChatRoomDto" useGeneratedKeys="true" keyProperty="id">
         insert into nthing.chat_room (purchase_id, created_at, is_deleted, is_completed)
-        values #{purchaseId}, now(), default, default
+        values (#{purchaseId}, now(), default, default)
     </insert>
 
     <select id="_findChatRoomByPurchaseId" parameterType="int" resultType="data.dto.ChatRoomDto">
