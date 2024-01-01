@@ -28,15 +28,17 @@ public class PurchaseService {
     private final JwtProvider jwtProvider;
     private final HttpServletRequest request;
 
-    public void createPurchase(PurchaseDto.Request purchaseRequest, String token) {
+    public PurchaseDto.Detail createPurchase(PurchaseDto.Request purchaseRequest, String token) {
         if (isValidDate(purchaseRequest.getDate()))
             throw new InvalidRequestException("Invalid date: " + purchaseRequest.getDate(), ErrorCode.INVALID_INPUT_VALUE);
         int userId = jwtProvider.parseJwt(token);
         purchaseRequest.setManager_id(userId);
         purchaseMapper.createPurchase(purchaseRequest);
+        int createdPurchaseID = purchaseRequest.getId();
         int purchaseId = purchaseRequest.getId();
         List<FileDto.Request> files = multiFileUtils.uploadFiles(purchaseRequest.getFiles(), "purchase");
         fileService.saveFiles(purchaseId, files);
+        return findPurchaseById(createdPurchaseID);
     }
 
     public List<PurchaseDto.Summary> findAllPurchase(Map<String, Object> map) {
