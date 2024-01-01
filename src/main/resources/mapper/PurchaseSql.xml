@@ -105,6 +105,7 @@
             a.status,
             a.price,
             a.place,
+            a.created_at,
             a.updated_at,
             d.nickname AS manager,
             a.category_id,
