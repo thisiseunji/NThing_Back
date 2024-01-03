@@ -54,7 +54,7 @@ public class PurchaseDto {
 
         private int manager_id;
 
-        @NotNull(message="카테고리를 필수입니다.")
+        @NotNull(message="카테고리는 필수입니다.")
         private Integer category_id;
 
         // 삭제할 첨부파일 id List

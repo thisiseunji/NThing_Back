@@ -10,7 +10,7 @@ import java.util.List;
 public interface ChatMapper {
     List<ChatRoomDto> findAllRoom();
     ChatRoomDto findRoomById(int id);
-    ChatRoomDto createChatRoom(ChatRoomDto chatRoomDto);
+    void createChatRoom(ChatRoomDto chatRoomDto);
 
     ChatRoomDto _findChatRoomByPurchaseId(int purchaseId);
 
