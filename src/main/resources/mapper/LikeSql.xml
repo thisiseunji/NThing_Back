@@ -5,33 +5,38 @@
         insert into nthing.`like` (user_id, purchase_id)
         values (#{userId}, #{purchaseId})
     </insert>
-    <select id="findLikedPurchasesByUserId" parameterType="int" resultType="data.dto.PurchaseDto$Summary">
-        select a.id, a.title, a.latitude, a.longitude, a.date, a.denominator, a.numerator, a.price, a.place, a.status
-             ,(
+    <select id="findLikedPurchasesByUserId" parameterType="map" resultType="data.dto.PurchaseDto$Summary">
+        select p.id, p.title, p.latitude, p.longitude, p.date, p.denominator, p.numerator, p.price, p.place, p.status
+            ,(
                 select count(*)
-                from nthing.like b
+                from nthing.like l
                 where true
-                    and b.user_id = #{user_id}
-                    and b.purchase_id = a.id
+                    and l.user_id = #{user_id}
+                    and l.purchase_id = p.id
             ) as is_liked
             ,(
                 select save_name
                 from nthing.purchase_file
                 where true
-                    and purchase_id = a.id
+                    and purchase_id = p.id
                     and delete_yn = false
                 order by id
                 limit 1
             ) as image
-        from nthing.purchase as a
+        from nthing.purchase as p
         where id in (select purchase_id from nthing.like where #{user_id})
-            and a.delete_yn = 0
+            and p.delete_yn = 0
             <if test="search_keyword != null and search_keyword != ''">
-                and a.title like CONCAT('%',#{search_keyword},'%')
+                and (p.title LIKE CONCAT('%', #{search_keyword}, '%') or p.description LIKE CONCAT('%', #{search_keyword}, '%'))
             </if>
-        <if test="sort != null and sort != ''">
-            order by ${sort}
-        </if>
+        <choose>
+            <when test="sort != null and sort != ''">
+                order by ${sort}
+            </when>
+            <otherwise>
+                order by -p.created_at
+            </otherwise>
+        </choose>
     </select>
     <select id="findLikeIdByUserIdAndPurchaseId" parameterType="map" resultType="java.lang.Integer">
         select id

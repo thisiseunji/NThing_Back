@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -23,8 +24,8 @@ public class LikeService {
         likeMapper.createLike(likeDto);
     }
 
-    public List<PurchaseDto.Summary> findLikedPurchasesByUserId(int userId){
-        return likeMapper.findLikedPurchasesByUserId(userId);
+    public List<PurchaseDto.Summary> findLikedPurchasesByUserId(Map<String, Object> map){
+        return likeMapper.findLikedPurchasesByUserId(map);
     }
 
     public Optional<Integer> findLikeIdByUserIdAndPurchaseId(int userId, int purchaseId) {
