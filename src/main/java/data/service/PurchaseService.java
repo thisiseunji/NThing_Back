@@ -91,7 +91,8 @@ public class PurchaseService {
         int userId = jwtProvider.parseJwt(token);
         Map<String, Object> map = Map.of("id", id, "user_id", userId);
         if (purchaseMapper.findPurchaseByIdAndUserId(map)) {
-            int purchaseId = purchaseMapper.updatePurchase(purchaseRequest);
+            purchaseMapper.updatePurchase(purchaseRequest);
+            int purchaseId = purchaseRequest.getId();
             List<FileDto.Request> uploadFiles = multiFileUtils.uploadFiles(purchaseRequest.getFiles(), "purchase");
             fileService.saveFiles(purchaseRequest.getId(), uploadFiles);
             return findPurchaseById(purchaseId);
