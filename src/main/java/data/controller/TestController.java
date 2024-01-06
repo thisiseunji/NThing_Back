@@ -1,24 +1,28 @@
 package data.controller;
 
+import data.dto.ApiResponse;
+import data.dto.MessageTokenDto;
+import data.service.UserService;
 import data.util.JwtProvider;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import io.swagger.annotations.*;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/test")
+@RequiredArgsConstructor
 public class TestController {
+    private final JwtProvider jwtProvider;
+    private final UserService userService;
 
-    @Autowired
-    private JwtProvider jwtProvider;
-
-    @GetMapping("/token/1")
-    public String getTestToken1() {
-        return jwtProvider.createToken(1);
-    }
-    @GetMapping("/token/2")
-    public String getTestToken2() {
-        return jwtProvider.createToken(2);
+    @GetMapping("/test/token/{id}")
+    @ApiOperation(value = "테스트용 토큰 발급", notes = "path variable로 id를 받아서 토큰을 발급합니다.")
+    public ResponseEntity<ApiResponse<MessageTokenDto>> getTestToken(@PathVariable int id) {
+        String token = jwtProvider.createToken(id);
+        userService.findById(token);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(ApiResponse.created(new MessageTokenDto("테스트 토큰 생성", token, null)));
     }
 }
