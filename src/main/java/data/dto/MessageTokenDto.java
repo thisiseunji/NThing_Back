@@ -9,19 +9,8 @@ import lombok.AllArgsConstructor;
 public class MessageTokenDto {
     @JsonProperty("message")
     private String message;
-    @JsonProperty("data")
-    private Data data;
-
-    public  MessageTokenDto(String message, String accessToken, String refreshToken) {
-        this.message = message;
-        this.data = new Data(accessToken, refreshToken);
-    }
-
-    @AllArgsConstructor
-    public class Data {
-        @JsonProperty("access_token")
-        private String accessToken;
-        @JsonProperty("refresh_token")
-        private String refreshToken;
-    }
+    @JsonProperty("access_token")
+    private String accessToken;
+    @JsonProperty("refresh_token")
+    private String refreshToken;
 }
