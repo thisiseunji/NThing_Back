@@ -1,7 +1,7 @@
 package data.controller;
 
+import data.dto.ApiResponse;
 import data.dto.CategoryDto;
-import data.exception.DuplicateCategoryNameException;
 import data.service.CategoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -20,13 +20,14 @@ public class CategoryController {
     private final CategoryService categoryService;
 
     @PostMapping("/category")
-    public ResponseEntity<?> createCategory(String name, MultipartFile file) {
+    public ResponseEntity<ApiResponse<?>> createCategory(String name, MultipartFile file) {
         categoryService.createCategory(name, file);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.created());
     }
 
     @GetMapping("/categories")
-    public List<CategoryDto> findAllCategory() {
-        return categoryService.findAllCategory();
+    public ResponseEntity<ApiResponse<List<CategoryDto>>> findAllCategory() {
+        return ResponseEntity.ok()
+                .body(ApiResponse.ok(categoryService.findAllCategory()));
     }
 }
