@@ -13,6 +13,6 @@ public interface PurchaseMapper {
     List<PurchaseDto.Summary> findAllPurchase(Map<String, Object> map);
     PurchaseDto.Detail findPurchaseById(int id);
     boolean findPurchaseByIdAndUserId(Map<String, Object> map);
-    void updatePurchase(PurchaseDto.Request purchase);
+    int updatePurchase(PurchaseDto.Request purchase);
     void deletePurchase(int id);
 }

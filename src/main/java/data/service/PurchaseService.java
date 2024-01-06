@@ -87,13 +87,14 @@ public class PurchaseService {
         return detail;
     }
 
-    public void updatePurchase(PurchaseDto.Request purchaseRequest, String token, int id) {
+    public PurchaseDto.Detail updatePurchase(PurchaseDto.Request purchaseRequest, String token, int id) {
         int userId = jwtProvider.parseJwt(token);
         Map<String, Object> map = Map.of("id", id, "user_id", userId);
         if (purchaseMapper.findPurchaseByIdAndUserId(map)) {
-            purchaseMapper.updatePurchase(purchaseRequest);
+            int purchaseId = purchaseMapper.updatePurchase(purchaseRequest);
             List<FileDto.Request> uploadFiles = multiFileUtils.uploadFiles(purchaseRequest.getFiles(), "purchase");
             fileService.saveFiles(purchaseRequest.getId(), uploadFiles);
+            return findPurchaseById(purchaseId);
         } else {
             throw new PurchaseNotFoundException("Purchase not found for id: " + id, ErrorCode.PURCHASE_NOT_FOUND);
         }

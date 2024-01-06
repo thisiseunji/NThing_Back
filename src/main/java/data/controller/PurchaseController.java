@@ -1,7 +1,7 @@
 package data.controller;
 
 import data.constants.ErrorCode;
-import data.dto.ApiResponseEntity;
+import data.dto.ApiResponse;
 import data.dto.FileDto;
 import data.exception.ValidationException;
 import data.service.FileService;
@@ -26,7 +26,7 @@ public class PurchaseController {
     private final FileService fileService;
 
     @PostMapping("/purchase")
-    public ApiResponseEntity<PurchaseDto.Detail> createPurchase(
+    public ResponseEntity<ApiResponse<PurchaseDto.Detail>> createPurchase(
             @RequestHeader("Authorization") String token,
             @Valid PurchaseDto.Request purchaseRequest,
             BindingResult bindingResult
@@ -34,11 +34,13 @@ public class PurchaseController {
         if (bindingResult.hasErrors()) {
             throw new ValidationException(bindingResult, ErrorCode.VALIDATION_ERROR);
         }
-        return ApiResponseEntity.created(purchaseService.createPurchase(purchaseRequest, token));
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(ApiResponse.created(purchaseService.createPurchase(purchaseRequest, token)));
     }
 
     @GetMapping("/purchases")
-    public ApiResponseEntity<List<PurchaseDto.Summary>> findAllPurchase(
+    public ResponseEntity<ApiResponse<List<PurchaseDto.Summary>>> findAllPurchase(
             String search_keyword,
             String sort,
             double latitude,
@@ -53,33 +55,32 @@ public class PurchaseController {
         map.put("longitude", longitude);
         map.put("radius", radius);
         map.put("status", status);
-        return ApiResponseEntity.ok(purchaseService.findAllPurchase(map));
+
+        return ResponseEntity.ok(ApiResponse.ok(purchaseService.findAllPurchase(map)));
     }
 
     @GetMapping("/purchase/{id}")
-    public ApiResponseEntity<PurchaseDto.Detail> findById(@PathVariable int id) {
-        PurchaseDto.Detail detail = purchaseService.findPurchaseById(id);
-        return ApiResponseEntity.ok(detail);
+    public ResponseEntity<ApiResponse<PurchaseDto.Detail>> findById(@PathVariable int id) {
+        return ResponseEntity.ok(ApiResponse.ok(purchaseService.findPurchaseById(id)));
     }
 
     @PatchMapping("/purchase/{id}")
-    public ApiResponseEntity<?> updatePurchase(
+    public ResponseEntity<ApiResponse<PurchaseDto.Detail>> updatePurchase(
             @RequestHeader("Authorization") String token,
             @PathVariable int id,
             PurchaseDto.Request purchaseRequest
     ) {
-        purchaseService.updatePurchase(purchaseRequest, token, id);
-        return ApiResponseEntity.noContent();
+        return ResponseEntity.ok(ApiResponse.ok(purchaseService.updatePurchase(purchaseRequest, token, id)));
     }
 
     @DeleteMapping("/purchase/{id}")
-    public ApiResponseEntity<?> deletePurchase(@PathVariable int id, @RequestHeader("Authorization") String token) {
+    public ResponseEntity<ApiResponse<?>> deletePurchase(@PathVariable int id, @RequestHeader("Authorization") String token) {
         purchaseService.deletePurchase(id, token);
-        return ApiResponseEntity.noContent();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(ApiResponse.noContent());
     }
 
     @GetMapping("/purchase/{purchaseId}/files")
-    public ApiResponseEntity<List<FileDto.Response>> findAllFileByPurchaseId(@PathVariable int purchaseId) {
-        return ApiResponseEntity.ok(fileService.findAllFileByPurchaseId(purchaseId));
+    public ResponseEntity<ApiResponse<List<FileDto.Response>>> findAllFileByPurchaseId(@PathVariable int purchaseId) {
+        return ResponseEntity.ok(ApiResponse.ok(fileService.findAllFileByPurchaseId(purchaseId)));
     }
 }
