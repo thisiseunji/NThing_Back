@@ -5,6 +5,7 @@ import data.dto.JwtToken;
 import data.dto.MessageTokenDto;
 import data.dto.UserDto;
 import data.exception.UnauthorizedException;
+import data.exception.UserNotFoundException;
 import data.mapper.UserMapper;
 import data.util.JwtProvider;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +35,11 @@ public class UserService {
 
     public UserDto findById(String token) {
         int loginId = jwtProvider.parseJwt(token);
-        return userMapper.findById(loginId);
+        UserDto user = userMapper.findById(loginId);
+        if (user == null) {
+            throw new UserNotFoundException("User not found for the provided token.", ErrorCode.USER_NOT_FOUND);
+        }
+        return user ;
     }
 
     public void deleteUser(String token) {

@@ -29,7 +29,14 @@ public class LoginFilter implements Filter{
             "/college",
             "/college/*",
             "/file/*",
-            "/category"
+            "/category",
+            /* swagger 관련 URI */
+            "/v3/api-docs/*",
+            "/v3/api-docs",
+            "/swagger-ui/*",
+            "/docs",
+            "/api-docs",
+            "/api-docs/*"
             /* 채팅 서비스 테스트용 */
             , "/ws/chat"
             , "/chat"

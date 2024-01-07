@@ -79,6 +79,12 @@ public class JwtProvider {
     }
 
     private String BearerRemove(String token) {
-        return token.substring("Bearer ".length());
+        String prefix = "Bearer ";
+
+        if (token.startsWith(prefix)) {
+            return token.substring(prefix.length());
+        } else {
+            return token;
+        }
     }
 }

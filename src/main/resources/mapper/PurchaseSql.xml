@@ -134,7 +134,7 @@
             AND delete_yn = 0
     </select>
 
-    <update id="updatePurchase" parameterType="data.dto.PurchaseDto$Request">
+    <update id="updatePurchase" parameterType="data.dto.PurchaseDto$Request" useGeneratedKeys="true" keyProperty="id">
         UPDATE purchase
         SET title = #{title},
             description = #{description},
