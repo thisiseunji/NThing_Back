@@ -1,6 +1,6 @@
 package data.controller;
 
-import data.dto.ApiResponse;
+import data.dto.ApiResult;
 import data.dto.MessageTokenDto;
 import data.dto.PurchaseDto;
 import data.dto.UserDto;
@@ -30,12 +30,12 @@ public class UserController {
     private final JwtProvider jwtProvider;
 
     @GetMapping("")
-    public ResponseEntity<ApiResponse<UserDto>> findById(@RequestHeader("Authorization") String token) {
-        return ResponseEntity.ok(ApiResponse.ok(userService.findById(token)));
+    public ResponseEntity<ApiResult<UserDto>> findById(@RequestHeader("Authorization") String token) {
+        return ResponseEntity.ok(ApiResult.ok(userService.findById(token)));
     }
 
     @GetMapping("/like")
-    public ResponseEntity<ApiResponse<List<PurchaseDto.Summary>>> findLikedPurchasesByUserId(
+    public ResponseEntity<ApiResult<List<PurchaseDto.Summary>>> findLikedPurchasesByUserId(
             @RequestHeader("Authorization") String token,
             String search_keyword,
             String sort
@@ -46,13 +46,13 @@ public class UserController {
         map.put("sort", sort);
         map.put("user_id", userId);
 
-        return ResponseEntity.ok(ApiResponse.ok(likeService.findLikedPurchasesByUserId(map)));
+        return ResponseEntity.ok(ApiResult.ok(likeService.findLikedPurchasesByUserId(map)));
     }
 
     @DeleteMapping("")
-    public ResponseEntity<ApiResponse<?>> deleteUser(@RequestHeader("Authorization") String token) {
+    public ResponseEntity<ApiResult<?>> deleteUser(@RequestHeader("Authorization") String token) {
         userService.deleteUser(token);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(ApiResponse.noContent());
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(ApiResult.noContent());
     }
 
     // 리프레시 토큰 검증

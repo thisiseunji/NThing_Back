@@ -1,6 +1,6 @@
 package data.controller;
 
-import data.dto.ApiResponse;
+import data.dto.ApiResult;
 import data.dto.CommentDto;
 import data.service.CommentService;
 import data.util.JwtProvider;
@@ -24,27 +24,27 @@ public class CommentController {
     }
 
     @PostMapping("/comment")
-    public ResponseEntity<ApiResponse<?>> createComment(
+    public ResponseEntity<ApiResult<?>> createComment(
             @RequestHeader("Authorization") String token,
             @RequestBody CommentDto.Request commentDto
     ) {
         int userId = jwtProvider.parseJwt(token);
         commentDto.setUserId(userId);
         commentService.createComment(commentDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.created());
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResult.created());
     }
 
     @GetMapping("/purchase/{purchase_id}/comments")
-    public ResponseEntity<ApiResponse<List<CommentDto.Response>>> findCommentById(
+    public ResponseEntity<ApiResult<List<CommentDto.Response>>> findCommentById(
             @RequestHeader(value = "Authorization", required = false) String token,
             @PathVariable int purchase_id
     ) {
         int userId = tokenValidation(token);
-        return ResponseEntity.ok(ApiResponse.ok(commentService.findCommentsByPurchaseId(purchase_id, userId)));
+        return ResponseEntity.ok(ApiResult.ok(commentService.findCommentsByPurchaseId(purchase_id, userId)));
     }
 
     @PatchMapping("/comment/{id}")
-    public ResponseEntity<ApiResponse<?>> updateComment(
+    public ResponseEntity<ApiResult<?>> updateComment(
             @RequestHeader("Authorization") String token,
             @PathVariable int id,
             @RequestBody CommentDto.Request commentDto
@@ -52,17 +52,17 @@ public class CommentController {
         int userId = jwtProvider.parseJwt(token);
         commentDto.setId(id);
         commentService.updateComment(userId, commentDto);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(ApiResponse.noContent());
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(ApiResult.noContent());
     }
 
     @DeleteMapping("/comment/{id}")
-    public ResponseEntity<ApiResponse<?>> deleteComment(
+    public ResponseEntity<ApiResult<?>> deleteComment(
             @RequestHeader("Authorization") String token,
             @PathVariable int id
     ) {
         int userId = jwtProvider.parseJwt(token);
         commentService.deleteComment(userId, id);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(ApiResponse.noContent());
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(ApiResult.noContent());
     }
 
     private int tokenValidation(String token) {
