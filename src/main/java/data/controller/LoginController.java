@@ -1,9 +1,10 @@
 package data.controller;
 
 import com.google.firebase.auth.FirebaseAuthException;
+import data.constants.ErrorCode;
 import data.dto.ApiResult;
+import data.dto.ErrorResponse;
 import data.dto.IdToken;
-import data.dto.MessageTokenDto;
 import data.service.LoginService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -22,16 +23,17 @@ public class LoginController {
     }
 
     @PostMapping("/login/google")
-    public ResponseEntity<ApiResult<MessageTokenDto>> googleLogin(@RequestBody IdToken token) {
+    public ResponseEntity<ApiResult<?>> googleLogin(@RequestBody IdToken token) {
         try {
             return ResponseEntity.ok(ApiResult.ok(loginService.googleLogin(token)));
         } catch (FirebaseAuthException e) {
-            return ResponseEntity.badRequest().build();
+            ErrorResponse errorResponse = new ErrorResponse(ErrorCode.VALIDATION_ERROR);
+            return ResponseEntity.badRequest().body(ApiResult.error(errorResponse));
         }
     }
 
     @PostMapping("/login/kakao")
-    public ResponseEntity<MessageTokenDto> kakaoLogin(@RequestBody IdToken token) {
+    public ResponseEntity<ApiResult<?>> kakaoLogin(@RequestBody IdToken token) {
         return loginService.kakaoLogin(token);
     }
 }
