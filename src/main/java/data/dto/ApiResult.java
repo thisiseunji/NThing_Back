@@ -35,8 +35,7 @@ public class ApiResult<T> {
         return new ApiResult<>(null, null, 204, null);
     }
 
-    public static ApiResult<?> error(ErrorCode errorCode) {
-        ErrorResponse response = new ErrorResponse(errorCode);
+    public static ApiResult<?> error(ErrorResponse response) {
         return new ApiResult<>(null, response.getMessage(), response.getStatus(), response.getCode());
     }
 }
