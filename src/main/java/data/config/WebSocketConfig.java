@@ -11,7 +11,7 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @EnableWebSocketMessageBroker
 @RequiredArgsConstructor
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
-    // 조건에 따라 사용할 수도 안 할수도 있음. 현재 보안을 담당하는 인터셉터가 있잖아
+    // 사용할 수도 안 할수도 있음.
     // private final WebsocketSecurityInterceptor websocketSecurityInterceptor;
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
@@ -19,7 +19,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                 //.setErrorHandler(stompExceptionHandler) 애러 처리시
                 .addEndpoint("/ws-stomp")
                 //.addInterceptors(new CustomHandshakeInterceptor()) 인터셉터는 필요하면 거르자. - 예를 들어 채팅방 인원 초과시(거래인원 관련) + 추가로 메시지 전송시 비속어 필터 등
-                //.withSockJS()를 사용할경우 활성화
                 .setAllowedOriginPatterns("*");
     }
 
