@@ -94,12 +94,14 @@ public class LoginService {
         // 가입된 사용자가 아닌 경우
         if(!duplicatedEmail(userInfo.get("kakao_account").get("email").asText())) {
             // 현재 가입되지 않은 사용자의 경우 -> 회원가입
+            String profileImage = userInfo.at("/properties/profile_image").asText();
+            profileImage = profileImage.replaceFirst("http://", "https://");
             userDto = UserDto.builder()
                     .provider("kakao")
                     .providerId(userInfo.at("/id").asText())
                     .nickname(userInfo.at("/kakao_account/profile/nickname").asText())
                     .email(userInfo.at("/kakao_account/email").asText())
-                    .profileImage(userInfo.at("/properties/profile_image").asText())
+                    .profileImage(profileImage)
                     .build();
             userMapper.join(userDto);
         }
