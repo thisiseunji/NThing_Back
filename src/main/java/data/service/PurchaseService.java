@@ -14,6 +14,7 @@ import data.util.JwtProvider;
 import data.util.MultiFileUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
@@ -51,6 +52,11 @@ public class PurchaseService {
             // 첫 번째 쿼리: 위치 설정
             purchaseMapper.setLocation(Map.of("latitude", map.get("latitude"), "longitude", map.get("longitude")));
             // 두 번째 쿼리: 데이터 조회
+            String token = (String) map.get("token");
+            if (StringUtils.hasText(token)) {
+                int userId = jwtProvider.parseJwt(token);
+                map.put("userId", userId);
+            }
             List<PurchaseDto.Summary> result = purchaseMapper.findAllPurchase(map);
             List<PurchaseDto.Summary> generatePurchaseDtoList = new ArrayList<>();
             for (PurchaseDto.Summary purchaseDto : result) {

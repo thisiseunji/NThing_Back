@@ -46,7 +46,8 @@ public class PurchaseController {
             double latitude,
             double longitude,
             int radius,
-            @RequestParam(defaultValue = "true") boolean status
+            @RequestParam(defaultValue = "true") boolean status,
+            @RequestHeader(value = "Authorization", required = false) String token
     ) {
         Map<String, Object> map = new HashMap<>();
         map.put("search_keyword", search_keyword);
@@ -55,6 +56,7 @@ public class PurchaseController {
         map.put("longitude", longitude);
         map.put("radius", radius);
         map.put("status", status);
+        map.put("token", token);
 
         return ResponseEntity.ok(ApiResult.ok(purchaseService.findAllPurchase(map)));
     }
