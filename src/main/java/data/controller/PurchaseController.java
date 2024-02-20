@@ -45,7 +45,7 @@ public class PurchaseController {
             String sort,
             double latitude,
             double longitude,
-            int radius,
+            int zoom,
             @RequestParam(defaultValue = "true") boolean status,
             @RequestHeader(value = "Authorization", required = false) String token
     ) {
@@ -54,7 +54,7 @@ public class PurchaseController {
         map.put("sort", sort);
         map.put("latitude", latitude);
         map.put("longitude", longitude);
-        map.put("radius", radius);
+        map.put("zoom", zoom);
         map.put("status", status);
         map.put("token", token);
 
