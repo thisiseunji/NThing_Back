@@ -1,7 +1,10 @@
 package data.config;
 
+import data.ChatPreHandler;
+import data.StompExceptionHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
@@ -11,14 +14,16 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @EnableWebSocketMessageBroker
 @RequiredArgsConstructor
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
-    // 사용할 수도 안 할수도 있음.
-    // private final WebsocketSecurityInterceptor websocketSecurityInterceptor;
+
+    private final StompExceptionHandler stompExceptionHandler;
+    private final ChatPreHandler chatPreHandler;
+
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry
-                //.setErrorHandler(stompExceptionHandler) 애러 처리시
+                .setErrorHandler(stompExceptionHandler)
                 .addEndpoint("/ws-stomp")
-                //.addInterceptors(new CustomHandshakeInterceptor()) 인터셉터는 필요하면 거르자. - 예를 들어 채팅방 인원 초과시(거래인원 관련) + 추가로 메시지 전송시 비속어 필터 등
+
                 .setAllowedOriginPatterns("*");
     }
 
@@ -26,5 +31,11 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void configureMessageBroker(MessageBrokerRegistry registry) {
         registry.enableSimpleBroker("/room"); // 이 주소를 구독하고 있는 독자에게 전송
         registry.setApplicationDestinationPrefixes("/send"); // 클라이언트가 메시지를 보낼 주소의 접두사
+    }
+
+    // client에서 서버로 들어오는 요청을 전달하는 채널
+    @Override
+    public void configureClientInboundChannel(ChannelRegistration registration) {
+        registration.interceptors(chatPreHandler);
     }
 }

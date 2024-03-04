@@ -15,7 +15,7 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import java.io.IOException;
 import java.util.Set;
-
+//스톰프는 앤드포인트를 거치지 않는다.
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -29,6 +29,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         super.afterConnectionEstablished(session);
+        System.out.println("연결됐나??");
     }
 
     // 채팅방은 거래 생성시에 함께 생성됨

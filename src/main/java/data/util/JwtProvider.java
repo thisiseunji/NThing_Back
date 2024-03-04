@@ -1,6 +1,7 @@
 package data.util;
 
 import data.constants.ErrorCode;
+import data.exception.JsonProcessingException;
 import data.exception.UnauthorizedException;
 import io.jsonwebtoken.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,7 +75,9 @@ public class JwtProvider {
                     .getBody();
             return claims.getExpiration().after(new Date());
         } catch (ExpiredJwtException e) {
-            throw new UnauthorizedException("유효하지 않은 토큰", ErrorCode.UNAUTHORIZED);
+            throw new UnauthorizedException("invalid token", ErrorCode.UNAUTHORIZED);
+        } catch (JwtException ex) {
+            throw new JsonProcessingException("invalid input value", ErrorCode.INVALID_INPUT_VALUE);
         }
     }
 

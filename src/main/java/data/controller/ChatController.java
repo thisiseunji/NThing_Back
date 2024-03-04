@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
 @Controller
@@ -14,7 +13,7 @@ import org.springframework.stereotype.Controller;
 public class ChatController {
     // Broker로 메시지 전달하는 역할
     // @EnableWebSocketMessageBroker 로 등록되는 빈임
-    private final SimpMessagingTemplate simpMessagingTemplate;
+    //private final SimpMessagingTemplate simpMessagingTemplate;
     private final ChatService chatService;
 
     @MessageMapping("/{roomId}") // prifix(send) + roomid 클라이언트가 메시지를 보낼 경로.
@@ -28,4 +27,6 @@ public class ChatController {
         chatService.createChatMessage(chatMessageDto); // 생성 후 id 담았다.
         return chatMessageDto;
     }
+
+    //header command 식별 + custom
 }
