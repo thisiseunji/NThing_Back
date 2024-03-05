@@ -130,16 +130,17 @@ public class PurchaseService {
     }
 
     private int getRadius(int zoom) {
-        int radius = 200;
+        int radius = 350;
         switch(zoom) {
-            case 15: radius=100;
+            case 15: radius=300;
                 break;
-            case 16: radius=50;
+            case 16: radius=250;
                 break;
-            case 17:
-            case 18: radius=20;
+            case 17: radius=200;
                 break;
-            case 19: radius=10;
+            case 18: radius=150;
+                break;
+            case 19: radius=100;
                 break;
         }
         return radius;
