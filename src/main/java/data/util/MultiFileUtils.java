@@ -129,8 +129,10 @@ public class MultiFileUtils {
             HttpServletRequest request = attributes.getRequest();
             String scheme = request.getScheme();
             String serverName = request.getServerName();
-            int serverPort = request.getServerPort();
-            return scheme + "s://" + serverName + ":" + serverPort + "/" + "file/";
+//            int serverPort = request.getServerPort();
+//            String result = scheme + "://" + serverName + ":" + serverPort + "/" + "file/";
+            String result = scheme + "s://" + serverName + "/" + "file/";
+            return result;
         }
         return "";
     }
