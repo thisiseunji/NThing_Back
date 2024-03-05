@@ -130,7 +130,7 @@ public class MultiFileUtils {
             String scheme = request.getScheme();
             String serverName = request.getServerName();
             int serverPort = request.getServerPort();
-            return scheme + "://" + serverName + ":" + serverPort + "/" + "file/";
+            return scheme + "s://" + serverName + ":" + serverPort + "/" + "file/";
         }
         return "";
     }
