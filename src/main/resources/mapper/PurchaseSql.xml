@@ -116,7 +116,14 @@
                 WHERE true
                     AND b.user_id = #{user_id}
                     AND b.purchase_id = #{id}
-            ) AS is_liked
+            ) AS is_liked,
+            (
+                SELECT COUNT(*)
+                FROM nthing.purchase p
+                WHERE true
+                    AND p.id = #{id}
+                    AND p.manager_id = #{user_id}
+            ) AS is_manager
         FROM
             nthing.purchase AS a
                 LEFT JOIN category c ON a.category_id = c.id
