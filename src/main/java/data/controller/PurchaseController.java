@@ -1,6 +1,7 @@
 package data.controller;
 
 import data.constants.ErrorCode;
+import data.dto.ApiResult;
 import data.dto.FileDto;
 import data.exception.ValidationException;
 import data.service.FileService;
@@ -25,7 +26,7 @@ public class PurchaseController {
     private final FileService fileService;
 
     @PostMapping("/purchase")
-    public ResponseEntity<?> createPurchase(
+    public ResponseEntity<ApiResult<PurchaseDto.Detail>> createPurchase(
             @RequestHeader("Authorization") String token,
             @Valid PurchaseDto.Request purchaseRequest,
             BindingResult bindingResult
@@ -33,52 +34,58 @@ public class PurchaseController {
         if (bindingResult.hasErrors()) {
             throw new ValidationException(bindingResult, ErrorCode.VALIDATION_ERROR);
         }
-        purchaseService.createPurchase(purchaseRequest, token);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(ApiResult.created(purchaseService.createPurchase(purchaseRequest, token)));
     }
 
     @GetMapping("/purchases")
-    public ResponseEntity<List<PurchaseDto.Summary>> findAllPurchase(
+    public ResponseEntity<ApiResult<List<PurchaseDto.Summary>>> findAllPurchase(
             String search_keyword,
             String sort,
             double latitude,
             double longitude,
-            int radius,
-            @RequestParam(defaultValue = "true") boolean status
+            int zoom,
+            @RequestParam(defaultValue = "true") boolean status,
+            @RequestHeader(value = "Authorization", required = false) String token
     ) {
         Map<String, Object> map = new HashMap<>();
         map.put("search_keyword", search_keyword);
         map.put("sort", sort);
         map.put("latitude", latitude);
         map.put("longitude", longitude);
-        map.put("radius", radius);
+        map.put("zoom", zoom);
         map.put("status", status);
-        return ResponseEntity.status(HttpStatus.OK).body(purchaseService.findAllPurchase(map));
+        map.put("token", token);
+
+        return ResponseEntity.ok(ApiResult.ok(purchaseService.findAllPurchase(map)));
     }
 
     @GetMapping("/purchase/{id}")
-    public ResponseEntity<?> findById(@PathVariable int id) {
-        PurchaseDto.Detail detail = purchaseService.findPurchaseById(id);
-        return ResponseEntity.ok(detail);
+    public ResponseEntity<ApiResult<PurchaseDto.Detail>> findById(
+            @PathVariable int id,
+            @RequestHeader("Authorization") String token
+    ) {
+        return ResponseEntity.ok(ApiResult.ok(purchaseService.findPurchaseById(id, token)));
     }
 
     @PatchMapping("/purchase/{id}")
-    public void updatePurchase(
+    public ResponseEntity<ApiResult<PurchaseDto.Detail>> updatePurchase(
             @RequestHeader("Authorization") String token,
             @PathVariable int id,
             PurchaseDto.Request purchaseRequest
     ) {
-        purchaseService.updatePurchase(purchaseRequest, token, id);
+        return ResponseEntity.ok(ApiResult.ok(purchaseService.updatePurchase(purchaseRequest, token, id)));
     }
 
     @DeleteMapping("/purchase/{id}")
-    public ResponseEntity<?> deletePurchase(@PathVariable int id, @RequestHeader("Authorization") String token) {
+    public ResponseEntity<ApiResult<?>> deletePurchase(@PathVariable int id, @RequestHeader("Authorization") String token) {
         purchaseService.deletePurchase(id, token);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(ApiResult.noContent());
     }
 
     @GetMapping("/purchase/{purchaseId}/files")
-    public List<FileDto.Response> findAllFileByPurchaseId(@PathVariable int purchaseId) {
-        return fileService.findAllFileByPurchaseId(purchaseId);
+    public ResponseEntity<ApiResult<List<FileDto.Response>>> findAllFileByPurchaseId(@PathVariable int purchaseId) {
+        return ResponseEntity.ok(ApiResult.ok(fileService.findAllFileByPurchaseId(purchaseId)));
     }
 }

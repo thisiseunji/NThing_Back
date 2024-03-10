@@ -108,7 +108,8 @@ public class PurchaseDto {
         private String manager;
         private int categoryId;
         private String categoryName;
-        private boolean isLiked;
+        private int isLiked;
+        private int isManager;
 
         private List<ImageDto> images;
 

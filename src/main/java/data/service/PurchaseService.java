@@ -14,6 +14,7 @@ import data.util.JwtProvider;
 import data.util.MultiFileUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
@@ -31,40 +32,49 @@ public class PurchaseService {
     private final ChatService chatService;
 
 
-    public void createPurchase(PurchaseDto.Request purchaseRequest, String token) {
+    public PurchaseDto.Detail createPurchase(PurchaseDto.Request purchaseRequest, String token) {
         if (isValidDate(purchaseRequest.getDate()))
             throw new InvalidRequestException("Invalid date: " + purchaseRequest.getDate(), ErrorCode.INVALID_INPUT_VALUE);
         int userId = jwtProvider.parseJwt(token);
         purchaseRequest.setManager_id(userId);
         purchaseMapper.createPurchase(purchaseRequest);
+        int createdPurchaseID = purchaseRequest.getId();
         int purchaseId = purchaseRequest.getId();
         List<FileDto.Request> files = multiFileUtils.uploadFiles(purchaseRequest.getFiles(), "purchase");
         fileService.saveFiles(purchaseId, files);
 
         // 채팅방 생성
         chatService.createChatRoom(ChatRoomDto.builder().purchaseId(purchaseId).build());
+        return findPurchaseById(createdPurchaseID, token);
     }
 
     public List<PurchaseDto.Summary> findAllPurchase(Map<String, Object> map) {
-            // 첫 번째 쿼리: 위치 설정
-            purchaseMapper.setLocation(Map.of("latitude", map.get("latitude"), "longitude", map.get("longitude")));
-            // 두 번째 쿼리: 데이터 조회
-            List<PurchaseDto.Summary> result = purchaseMapper.findAllPurchase(map);
-            List<PurchaseDto.Summary> generatePurchaseDtoList = new ArrayList<>();
-            for (PurchaseDto.Summary purchaseDto : result) {
-                String image = purchaseDto.getImage();
-                purchaseDto.setImage(image != null
-                                ? multiFileUtils.getDomain() + image
-                                : null
-                );
-                generatePurchaseDtoList.add(purchaseDto);
-            }
-            return generatePurchaseDtoList;
+        int zoom = (int) map.get("zoom");
+        map.put("radius", getRadius(zoom));
+        // 첫 번째 쿼리: 위치 설정
+        purchaseMapper.setLocation(Map.of("latitude", map.get("latitude"), "longitude", map.get("longitude")));
+        // 두 번째 쿼리: 데이터 조회
+        String token = (String) map.get("token");
+        if (StringUtils.hasText(token)) {
+            int userId = jwtProvider.parseJwt(token);
+            map.put("userId", userId);
+        }
+        List<PurchaseDto.Summary> result = purchaseMapper.findAllPurchase(map);
+        List<PurchaseDto.Summary> generatePurchaseDtoList = new ArrayList<>();
+        for (PurchaseDto.Summary purchaseDto : result) {
+            String image = purchaseDto.getImage();
+            purchaseDto.setImage(image != null
+                            ? multiFileUtils.getDomain() + image
+                            : null
+            );
+            generatePurchaseDtoList.add(purchaseDto);
+        }
+        return generatePurchaseDtoList;
     }
 
-    public PurchaseDto.Detail findPurchaseById(int id) {
-        PurchaseDto.Detail detail = purchaseMapper.findPurchaseById(id);
-
+    public PurchaseDto.Detail findPurchaseById(int id, String token) {
+        Map<String, Object> map = Map.of("id", id, "user_id", jwtProvider.parseJwt(token));
+        PurchaseDto.Detail detail = purchaseMapper.findPurchaseById(map);
         if (detail == null)
             throw new PurchaseNotFoundException("Purchase not found for ID: " + id, ErrorCode.PURCHASE_NOT_FOUND);
 
@@ -85,13 +95,15 @@ public class PurchaseService {
         return detail;
     }
 
-    public void updatePurchase(PurchaseDto.Request purchaseRequest, String token, int id) {
+    public PurchaseDto.Detail updatePurchase(PurchaseDto.Request purchaseRequest, String token, int id) {
         int userId = jwtProvider.parseJwt(token);
         Map<String, Object> map = Map.of("id", id, "user_id", userId);
         if (purchaseMapper.findPurchaseByIdAndUserId(map)) {
             purchaseMapper.updatePurchase(purchaseRequest);
+            int purchaseId = purchaseRequest.getId();
             List<FileDto.Request> uploadFiles = multiFileUtils.uploadFiles(purchaseRequest.getFiles(), "purchase");
             fileService.saveFiles(purchaseRequest.getId(), uploadFiles);
+            return findPurchaseById(purchaseId, token);
         } else {
             throw new PurchaseNotFoundException("Purchase not found for id: " + id, ErrorCode.PURCHASE_NOT_FOUND);
         }
@@ -115,5 +127,22 @@ public class PurchaseService {
         LocalDateTime date = LocalDateTime.parse(dateString, formatter);
         LocalDateTime currentTime = LocalDateTime.now();
         return date.isBefore(currentTime);
+    }
+
+    private int getRadius(int zoom) {
+        int radius = 350;
+        switch(zoom) {
+            case 15: radius=300;
+                break;
+            case 16: radius=250;
+                break;
+            case 17: radius=200;
+                break;
+            case 18: radius=150;
+                break;
+            case 19: radius=100;
+                break;
+        }
+        return radius;
     }
 }

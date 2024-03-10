@@ -4,10 +4,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.FirebaseToken;
-import data.dto.IdToken;
-import data.dto.JwtToken;
-import data.dto.MessageTokenDto;
-import data.dto.UserDto;
+import data.constants.ErrorCode;
+import data.dto.*;
 import data.mapper.UserMapper;
 import data.util.JwtProvider;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,25 +79,29 @@ public class LoginService {
         return userMapper.isValidEmail(email);
     }
 
-    public ResponseEntity<MessageTokenDto> kakaoLogin(IdToken token) {
+    public ResponseEntity<ApiResult<?>> kakaoLogin(IdToken token) {
         // 카카오에 사용자 정보 요청
         String kakaoAccesstoken = token.getIdToken();
         JsonNode userInfo = getUserInfo(kakaoAccesstoken);
 
         if(!userInfo.get("kakao_account").get("has_email").asText().equals("true")) {
             // 사용자의 이메일 정보가 없는 경우 -> 오류
-            return new ResponseEntity<>(new MessageTokenDto("이메일 정보 없음", null, null), HttpStatus.NOT_FOUND);
+            ErrorResponse errorResponse = new ErrorResponse(ErrorCode.INVALID_INPUT_VALUE);
+            errorResponse.setMessage("이메일 정보 없음");
+            return ResponseEntity.badRequest().body(ApiResult.error(errorResponse));
         }
         UserDto userDto = new UserDto();
         // 가입된 사용자가 아닌 경우
         if(!duplicatedEmail(userInfo.get("kakao_account").get("email").asText())) {
             // 현재 가입되지 않은 사용자의 경우 -> 회원가입
+            String profileImage = userInfo.at("/properties/profile_image").asText();
+            profileImage = profileImage.replaceFirst("http://", "https://");
             userDto = UserDto.builder()
                     .provider("kakao")
                     .providerId(userInfo.at("/id").asText())
                     .nickname(userInfo.at("/kakao_account/profile/nickname").asText())
                     .email(userInfo.at("/kakao_account/email").asText())
-                    .profileImage(userInfo.at("/properties/profile_image").asText())
+                    .profileImage(profileImage)
                     .build();
             userMapper.join(userDto);
         }
@@ -114,8 +116,8 @@ public class LoginService {
         userMapper.updateRefreshToken(userDto);
 
         JwtToken jwtToken = JwtToken.builder().token(jwtProvider.createToken(findId)).build();
-
-        return new ResponseEntity<>(new MessageTokenDto("카카오 로그인 성공", jwtToken.getToken(), refreshToken.getToken()), HttpStatus.OK);
+        MessageTokenDto messageTokenDto = new MessageTokenDto("카카오 로그인 성공", jwtToken.getToken(), refreshToken.getToken());
+        return ResponseEntity.ok(ApiResult.ok(messageTokenDto));
     }
 
     // 유저정보 요청(카카오)

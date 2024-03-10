@@ -5,11 +5,11 @@
         insert into nthing.comment (content, is_private, created_at, user_id, purchase_id, parent_id)
         values (#{content}, #{isPrivate}, now(), #{userId}, #{purchaseId}, #{parentId})
     </insert>
-    <select id="findCommentsByPurchaseId" resultType="data.dto.CommentDto$Response" parameterType="map">
+    <select id="findCommentsByPurchaseId" resultType="data.dto.CommentDto$Response" parameterType="int">
         select
-            id, content, is_private, created_at, updated_at, user_id,
-            (select nickname from user where id=#{userId}) as nickname, purchase_id, parent_id,
-            (select profile_image from user where id=#{userId}) as profile_image
+            id, content, is_private, created_at, updated_at,
+            (select nickname from user where id=user_id) as nickname, purchase_id, parent_id,
+            (select profile_image from user where id=user_id) as profile_image
         from nthing.comment
         where is_deleted = False
             and purchase_id = #{purchaseId}

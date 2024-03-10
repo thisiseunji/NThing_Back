@@ -3,8 +3,16 @@ package data.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import data.dto.ApiResult;
 import data.dto.CollegeDto;
+import data.dto.ErrorResponse;
 import data.mapper.CollegeMapper;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
@@ -14,6 +22,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.HashMap;
 import java.util.List;
 
+@Tag(name = "college", description = "college API")
 @RestController
 public class CollegeController {
 
@@ -27,19 +36,34 @@ public class CollegeController {
     private String univ_key;
 
     // id를 기반 학교 검색
+    @Operation(summary = "학교 조회(id)", description = "college id에 해당되는 학교를 조회합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "학교 조회 성공", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiResult.class))),
+    })
     @GetMapping("/college/{id}")
-    public CollegeDto selectCollegeById(@PathVariable Integer id) {
-        return collegeMapper.selectCollegeById(id);
+    public ResponseEntity<ApiResult<CollegeDto>> selectCollegeById(@PathVariable Integer id) {
+        return ResponseEntity.ok()
+                .body(ApiResult.ok(collegeMapper.selectCollegeById(id)));
     }
     // 검색 키워드에 따른 학교 검색
+    @Operation(summary = "학교 조회(키워드)", description = "키워드에 해당되는 학교를 조회합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "학교 조회 성공", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiResult.class))),
+    })
     @GetMapping("/college")
-    public List<CollegeDto> selectCollegeList(@RequestParam(required = false) String search_keyword){
-        return collegeMapper.selectCollegeList(search_keyword);
+    public ResponseEntity<ApiResult<List<CollegeDto>>>  selectCollegeList(@RequestParam(required = false) String search_keyword){
+        return ResponseEntity.ok()
+                .body(ApiResult.ok(collegeMapper.selectCollegeList(search_keyword)));
     }
 
+    @Operation(summary = "학교 생성", description = "학교를 생성합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "학교 생성 성공", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ApiResult.class))),
+            @ApiResponse(responseCode = "400", description = "학교 생성 실패", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
+    })
     // 대학명, 주소 저장
     @PostMapping("/college")
-    public int insertCollegeList() throws JsonProcessingException {
+    public ResponseEntity<ApiResult<Integer>> insertCollegeList() throws JsonProcessingException {
 
         int result = 0;
         // 대학명을 가져오는 api.
@@ -115,7 +139,7 @@ public class CollegeController {
             // insert
             result++;
         }
-        return result;
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResult.created(result));
     }
 
 }

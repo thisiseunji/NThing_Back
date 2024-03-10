@@ -1,60 +1,58 @@
 package data.controller;
 
-import data.constants.ErrorCode;
+import data.dto.ApiResult;
 import data.dto.MessageTokenDto;
 import data.dto.PurchaseDto;
 import data.dto.UserDto;
-import data.exception.UserNotFoundException;
 import data.service.UserService;
 import data.service.LikeService;
 import data.util.JwtProvider;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+@Slf4j
 @RestController
 @RequestMapping("/user")
-@Slf4j
+@RequiredArgsConstructor
 public class UserController {
 
     private final UserService userService;
     private final LikeService likeService;
     private final JwtProvider jwtProvider;
 
-    @Autowired
-    public UserController(UserService userService, LikeService likeService, JwtProvider jwtProvider) {
-        this.userService = userService;
-        this.likeService = likeService;
-        this.jwtProvider = jwtProvider;
-    }
-
     @GetMapping("")
-    public ResponseEntity<UserDto> findById(@RequestHeader("Authorization") String token) {
-        UserDto user = userService.findById(token);
-        if (user == null) {
-            throw new UserNotFoundException("User not found for the provided token.", ErrorCode.USER_NOT_FOUND);
-        }
-        return ResponseEntity.ok(user);
+    public ResponseEntity<ApiResult<UserDto>> findById(@RequestHeader("Authorization") String token) {
+        return ResponseEntity.ok(ApiResult.ok(userService.findById(token)));
     }
 
     @GetMapping("/like")
-    public ResponseEntity<List<PurchaseDto.Summary>> findLikedPurchasesByUserId(
-            @RequestHeader("Authorization") String token
+    public ResponseEntity<ApiResult<List<PurchaseDto.Summary>>> findLikedPurchasesByUserId(
+            @RequestHeader("Authorization") String token,
+            String search_keyword,
+            String sort
     ) {
         int userId = jwtProvider.parseJwt(token);
-        List<PurchaseDto.Summary> likedPurchases = likeService.findLikedPurchasesByUserId(userId);
-        return ResponseEntity.ok(likedPurchases);
+        Map<String, Object> map = new HashMap<>();
+        map.put("search_keyword", search_keyword);
+        map.put("sort", sort);
+        map.put("user_id", userId);
+
+        return ResponseEntity.ok(ApiResult.ok(likeService.findLikedPurchasesByUserId(map)));
     }
 
     @DeleteMapping("")
-    public ResponseEntity<Void> deleteUser(@RequestHeader("Authorization") String token) {
+    public ResponseEntity<ApiResult<?>> deleteUser(@RequestHeader("Authorization") String token) {
         userService.deleteUser(token);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(ApiResult.noContent());
     }
 
     // 리프레시 토큰 검증
