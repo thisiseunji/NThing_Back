@@ -22,22 +22,21 @@ import java.nio.charset.StandardCharsets;
 public class StompExceptionHandler extends StompSubProtocolErrorHandler {
     @Override
     public Message<byte[]> handleClientMessageProcessingError(Message<byte[]> clientMessage, Throwable ex) {
-        System.out.println("ex.getCause().getMessage() : "+ ex.getCause().getMessage());
 
         Throwable e = ex.getCause();
         log.error(e.getMessage());
 
         if (e instanceof UnauthorizedException) {
-            ErrorResponse response = new ErrorResponse((ErrorCode.UNAUTHORIZED);
+            ErrorResponse response = new ErrorResponse((ErrorCode.UNAUTHORIZED));
             return errorMessage(response);
 
         } else if (e instanceof  JsonProcessingException) {
-            ErrorResponse response = new ErrorResponse((ErrorCode.JSON_PROCESSING_ERROR);
+            ErrorResponse response = new ErrorResponse((ErrorCode.JSON_PROCESSING_ERROR));
             return errorMessage(response);
         } else {
             ErrorResponse resppnse = new ErrorResponse(ErrorCode.INTERNAL_SERVER_ERROR);
             return errorMessage(resppnse);
-        }
+        } // 이후 추가
     }
 
     @Override

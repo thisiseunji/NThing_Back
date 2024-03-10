@@ -17,12 +17,16 @@ import org.springframework.stereotype.Component;
 public class ChatPreHandler implements ChannelInterceptor {
 
     private final JwtProvider jwtProvider;
+    // 임시변수
+    int count = 0;
 
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
+        System.out.println(++count);
 
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(message);
         StompCommand command = headerAccessor.getCommand();
+        System.out.println(command);
 
         if (StompCommand.CONNECT.equals(command)) {
             String token;
@@ -42,8 +46,6 @@ public class ChatPreHandler implements ChannelInterceptor {
                 throw new JsonProcessingException("invalid input value", ErrorCode.INVALID_INPUT_VALUE);
             }
         }
-
-        // 애러가 발생하지 않으면 실행할 부분
 
         return message;
 
