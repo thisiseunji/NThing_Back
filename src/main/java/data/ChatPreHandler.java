@@ -5,13 +5,14 @@ import data.exception.JsonProcessingException;
 import data.exception.UnauthorizedException;
 import data.util.JwtProvider;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.stereotype.Component;
-
+@Slf4j
 @RequiredArgsConstructor
 @Component
 public class ChatPreHandler implements ChannelInterceptor {
@@ -22,11 +23,13 @@ public class ChatPreHandler implements ChannelInterceptor {
 
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
-        System.out.println(++count);
+
 
         StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(message);
         StompCommand command = headerAccessor.getCommand();
         System.out.println(command);
+
+        log.info("commmand : " + command);
 
         if (StompCommand.CONNECT.equals(command)) {
             String token;

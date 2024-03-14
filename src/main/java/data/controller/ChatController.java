@@ -4,6 +4,7 @@ import data.dto.ChatMessageDto;
 import data.service.ChatService;
 import data.util.JwtProvider;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Controller;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Controller
 @RequiredArgsConstructor
 public class ChatController {
@@ -46,6 +48,8 @@ public class ChatController {
         chatService.createChatMessage(chatMessageDto); // 생성 후 id 담았다.
         return chatMessageDto;
     }
+
+
 
     //header command 식별 + custom
 }
