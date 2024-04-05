@@ -40,7 +40,7 @@ public class PurchaseService {
         purchaseMapper.createPurchase(purchaseRequest);
         int createdPurchaseID = purchaseRequest.getId();
         int purchaseId = purchaseRequest.getId();
-        List<FileDto.Request> files = multiFileUtils.uploadFiles(purchaseRequest.getFiles(), "purchase");
+        List<FileDto.Request> files = multiFileUtils.uploadFiles(purchaseRequest.getAdded_files(), "purchase");
         fileService.saveFiles(purchaseId, files);
 
         // 채팅방 생성
@@ -101,8 +101,9 @@ public class PurchaseService {
         if (purchaseMapper.findPurchaseByIdAndUserId(map)) {
             purchaseMapper.updatePurchase(purchaseRequest);
             int purchaseId = purchaseRequest.getId();
-            List<FileDto.Request> uploadFiles = multiFileUtils.uploadFiles(purchaseRequest.getFiles(), "purchase");
+            List<FileDto.Request> uploadFiles = multiFileUtils.uploadFiles(purchaseRequest.getAdded_files(), "purchase");
             fileService.saveFiles(purchaseRequest.getId(), uploadFiles);
+            fileService.deleteAllFileByIds(purchaseRequest.getRemoved_files());
             return findPurchaseById(purchaseId, token);
         } else {
             throw new PurchaseNotFoundException("Purchase not found for id: " + id, ErrorCode.PURCHASE_NOT_FOUND);
@@ -114,8 +115,6 @@ public class PurchaseService {
         Map<String, Object> map = Map.of("id", id, "user_id", userId);
         if (purchaseMapper.findPurchaseByIdAndUserId(map)) {
             purchaseMapper.deletePurchase(id);
-            List<FileDto.Response> deleteFiles = fileService.findAllFileByIds(fileService.findAllIdsByPurchaseId(id));
-            multiFileUtils.deleteFiles(deleteFiles);
             fileService.deleteAllFileByIds(fileService.findAllIdsByPurchaseId(id));
         } else {
             throw new PurchaseNotFoundException("Purchase not found for id: " + id, ErrorCode.PURCHASE_NOT_FOUND);

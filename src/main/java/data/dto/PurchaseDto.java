@@ -50,7 +50,7 @@ public class PurchaseDto {
         @NotBlank(message="거래 장소는 필수 입니다.")
         private String place;
 
-        private List<MultipartFile> files = new ArrayList<>();
+        private List<MultipartFile> added_files = new ArrayList<>();
 
         private int manager_id;
 
@@ -58,7 +58,7 @@ public class PurchaseDto {
         private Integer category_id;
 
         // 삭제할 첨부파일 id List
-        private List<Integer> removeFileIds = new ArrayList<>();
+        private List<Integer> removed_files;
     }
 
     @Getter
