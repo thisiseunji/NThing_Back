@@ -23,7 +23,7 @@
         where purchase_id = #{purchaseId}
     </select>
 
-    <insert id="createChatMessage" parameterType="data.dto.ChatMessageDto">
+    <insert id="createChatMessage" parameterType="data.dto.ChatMessageDto" useGeneratedKeys="true" keyProperty="id">
         insert into nthing.chat_message (sender, message, sent_at, chat_room_id)
         values (#{sender}, #{message}, now(), #{chatRoomId})
     </insert>

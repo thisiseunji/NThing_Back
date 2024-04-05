@@ -36,11 +36,9 @@ public class LoginFilter implements Filter{
             "/swagger-ui/*",
             "/docs",
             "/api-docs",
-            "/api-docs/*"
+            "/api-docs/*",
             /* 채팅 서비스 테스트용 */
-            , "/ws/chat"
-            , "/chat"
-            , "/chat/*"
+            "/ws-stomp"
     }; // 추가 필요
 
     @Override
@@ -60,10 +58,10 @@ public class LoginFilter implements Filter{
         if(isLoginCheckPath(requestURI)) { // 검증해야하는 URI인 경우
             if (accessToken != null) { // 엑세스 토큰이 null이 아니면
                 if (!jwtProvider.isValidToken(accessToken)) { // 유효하지 않은 토큰의 경우
-                    throw new UnauthorizedException("유효하지 않은 토큰", ErrorCode.UNAUTHORIZED);
+                    throw new UnauthorizedException("invalid token", ErrorCode.UNAUTHORIZED);
                 }
             } else { // 엑세스 토큰이 없는 경우
-                throw new UnauthorizedException("토큰 정보 없음", ErrorCode.UNAUTHORIZED);
+                throw new UnauthorizedException("null token", ErrorCode.UNAUTHORIZED);
             }
         }
         chain.doFilter(request, response);

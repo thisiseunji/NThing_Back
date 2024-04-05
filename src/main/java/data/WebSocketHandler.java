@@ -15,18 +15,21 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import java.io.IOException;
 import java.util.Set;
-
+//스톰프는 앤드포인트를 거치지 않는다.
 @Slf4j
-@RequiredArgsConstructor
 @Component
+@RequiredArgsConstructor
 public class WebSocketHandler extends TextWebSocketHandler {
     private final ObjectMapper objectMapper;
     private final ChatService chatService;
+
+    // 인메모리 구현한 코드
     private final ChatRoomManger chatRoomManger;
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         super.afterConnectionEstablished(session);
+        System.out.println("연결됐나??");
     }
 
     // 채팅방은 거래 생성시에 함께 생성됨
@@ -36,7 +39,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
         System.out.println("payload : " + payload);
         // 일단 메시지 객체에 넣어서 정보를 활용함
         ChatMessageDto chatMessage = objectMapper.readValue(payload, ChatMessageDto.class);
-        // 구매글이 작성되면 방이 생성되어야 하기 때문에 없는 방일 가능성은 없음
+        // 구매글이 작성되면 방이 생성되어야 하기 때문에 없는 방일 가능성은 없음(구매글 삭제시 함께 삭제? deleted y/n으로 처리할 것)
         ChatRoomDto chatRoom = chatRoomManger.getChatRoom(chatMessage.getChatRoomId());
         Set<WebSocketSession> sessions = chatRoom.getSessions(); // 해당 방에 있는 사용자 세션 WebsocketSession
 
@@ -48,7 +51,6 @@ public class WebSocketHandler extends TextWebSocketHandler {
                 // 0. 채팅방은 이미 있다는 전제하에 동작 수행
                 // 1. 채팅방과 유저 데이터 입력(create or update 로 구현해야함. 들락날락할수도 있으니까/ 객체와 DB모두)
 
-                // !이후 헤더의 유저값으로 설정하도록 수정필요!(senderId 삭제)
                 chatRoom.setUserId(chatMessage.getSenderId());
                 chatService.createOrUpdateChatRoomUser(chatRoom);
                 sessions.add(session);
@@ -59,7 +61,6 @@ public class WebSocketHandler extends TextWebSocketHandler {
                 break;
 
             case OUIT:
-                // !이후 헤더의 유저값으로 설정하도록 수정필요!(senderId 삭제)
                 chatRoom.setUserId(chatMessage.getSenderId());
                 // 1. 채팅방과 유저 중간테이블 데이터 업데이트 - leftAt
                 chatService.deleteChatRoomUser(chatRoom);
@@ -78,7 +79,6 @@ public class WebSocketHandler extends TextWebSocketHandler {
 
                     case KICK_OUT:
                         // quit과 같음
-                        // !이후 헤더의 유저값으로 설정하도록 수정필요!(senderId 삭제)
                         chatRoom.setUserId(chatMessage.getSenderId());
                         chatService.deleteChatRoomUser(chatRoom);
                         sessions.remove(session);
