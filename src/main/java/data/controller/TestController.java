@@ -33,10 +33,11 @@ public class TestController {
     })
     @GetMapping("/test/token/{id}")
     public ResponseEntity<ApiResult<MessageTokenDto>> getTestToken(@PathVariable int id) {
-        String token = jwtProvider.createToken(id);
-        userService.findById(token);
+        String accessToken = jwtProvider.createToken(id);
+        String refreshToken = jwtProvider.createRefreshToken(id);
+        userService.findById(accessToken);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(ApiResult.created(new MessageTokenDto("테스트 토큰 생성", token, null)));
+                .body(ApiResult.created(new MessageTokenDto("테스트 토큰 생성", accessToken, refreshToken)));
     }
 }
