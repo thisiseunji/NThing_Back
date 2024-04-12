@@ -66,22 +66,39 @@ public class JwtProvider {
                 .get("loginId", Integer.class);
     }
 
-    // 토큰 유효성 확인(리프레시 토큰도 마찬가지)
-    public boolean isValidToken(String token) {
+    // 액세스 토큰 유효성 확인
+    public boolean isValidAccessToken(String token) {
         try {
-            Claims claims = Jwts.parser()
-                    .setSigningKey(secret)
-                    .parseClaimsJws(BearerRemove(token))
-                    .getBody();
-            return claims.getExpiration().after(new Date());
+            return isValidToken(token);
         } catch (ExpiredJwtException e) {
-            throw new UnauthorizedException("invalid token", ErrorCode.UNAUTHORIZED);
+            throw new UnauthorizedException("invalid access token", ErrorCode.ACCESS_TOKEN_EXPIRED);
         } catch (JwtException ex) {
             throw new JsonProcessingException("invalid input value", ErrorCode.INVALID_INPUT_VALUE);
         }
     }
 
-    private String BearerRemove(String token) {
+    // 리프레시 토큰 유효성 확인
+    public boolean isValidRefreshToken(String token) {
+        try {
+            return isValidToken(token);
+        } catch (ExpiredJwtException e) {
+            throw new UnauthorizedException("invalid refresh token", ErrorCode.REFRESH_TOKEN_EXPIRED);
+        } catch (JwtException ex) {
+            throw new JsonProcessingException("invalid input value", ErrorCode.INVALID_INPUT_VALUE);
+        }
+    }
+
+    // 토큰 유효성 확인
+    public boolean isValidToken(String token) {
+        Claims claims = Jwts.parser()
+                .setSigningKey(secret)
+                .parseClaimsJws(BearerRemove(token))
+                .getBody();
+        return claims.getExpiration().after(new Date());
+
+    }
+
+    public String BearerRemove(String token) {
         String prefix = "Bearer ";
 
         if (token.startsWith(prefix)) {
