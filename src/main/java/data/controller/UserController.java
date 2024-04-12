@@ -56,7 +56,7 @@ public class UserController {
     }
 
     // 리프레시 토큰 검증
-    @PostMapping("/reToken")
+    @PostMapping("/retoken")
     public ResponseEntity<MessageTokenDto> checkRefreshToken(@RequestHeader("Authorization") String token) {
         return userService.checkRefreshToken(token);
     }
